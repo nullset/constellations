@@ -1,0 +1,21 @@
+{
+  "name": "constellations",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --port 7800",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^2.7.2"
+  },
+  "dependencies": {
+    "@nx-js/observer-util": "^4.2.2",
+    "@ungap/custom-elements": "^1.0.0",
+    "construct-style-sheets-polyfill": "^3.0.5",
+    "deepmerge": "^4.2.2",
+    "proxy-pants": "^0.4.3",
+    "uhtml": "^2.8.0",
+    "weak-value": "^0.2.3"
+  }
+}
