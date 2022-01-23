@@ -1,4 +1,14 @@
 import { html, define, observe, observable, raw } from "./src/index";
+import {
+  symbol as keyboardNavigableSymbol,
+  mixin as keyboardNavigable,
+} from "./src/mixins/keyboardNavigable";
+
+import {
+  tabbableSymbol,
+  tabbable,
+  tabsElementSymbol,
+} from "./src/mixins/tabbable";
 
 const Tabs = {
   styles: `
@@ -39,6 +49,7 @@ const Tabs = {
   },
   render() {
     return html`
+      ${this.$.activeTab}
       <nav part="tabs">
         <slot name="tab"></slot>
       </nav>
@@ -49,58 +60,6 @@ const Tabs = {
   },
 };
 define("bliss-tabs", Tabs);
-
-const tabs = Symbol("tabs");
-const tabbable$ = Symbol("tabbable$");
-
-function tabbable(rootNode = "bliss-tabs") {
-  return {
-    props: {
-      active: { type: Boolean },
-    },
-    connectedCallback() {
-      this[tabs] = this.getContext(rootNode);
-      this[tabbable$] = observable({}); // Tabbable mixin internal state.
-      const nodeList = this[tabs].querySelectorAll(`:scope > ${this.tagName}`);
-      const nodes = Array.from(nodeList);
-
-      this[tabbable$].index = nodes.findIndex((node) => node === this);
-
-      // If this.active is true, then set tabs.$activeTab to be this tab.
-      observe(() => {
-        if (this.$.active) this[tabs].$.activeTab = this[tabbable$].index;
-      });
-
-      // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
-      observe(() => {
-        this.$.active = this[tabs].$.activeTab === this[tabbable$].index;
-      });
-    },
-
-    disconnectedCallback() {
-      if (this[tabs].$.activeTab === this[tabbable$].index)
-        this[tabs].$.activeTab = undefined;
-    },
-  };
-}
-
-const keyboardNavigable = {
-  props: { tabindex: { type: Number, default: 0 } },
-  connectedCallback() {
-    this.addEventListener("keypress", (e) => {
-      if (
-        e.target === this &&
-        !this.$.disabled &&
-        ["Enter", " "].includes(e.key)
-      ) {
-        this.click(e);
-      }
-    });
-  },
-  onclick(e) {
-    debugger;
-  },
-};
 
 const Tab = {
   styles: `
@@ -123,7 +82,7 @@ const Tab = {
   },
   onclick(e) {
     if (!this.$.disabled) {
-      this[tabs].$.activeTab = this[tabbable$].index;
+      this[tabsElementSymbol].$.activeTab = this[tabbableSymbol].index;
     }
   },
 };
@@ -134,7 +93,8 @@ define("bliss-tab", Tab, {
 const TabContent = {
   connectedCallback() {
     observe(() => {
-      const activeIsNotHost = this[tabs].$.activeTab !== this[tabbable$].index;
+      const activeIsNotHost =
+        this[tabsElementSymbol].$.activeTab !== this[tabbableSymbol].index;
       this.$.hidden = activeIsNotHost;
     });
   },
@@ -153,3 +113,65 @@ define("bliss-alert-button", AlertButton, {
   base: HTMLButtonElement,
   extend: "button",
 });
+
+// const Foo = (mixins) => {
+//   const {m}
+//   return {}
+// }
+
+const Clicky = {
+  name: "Clicky",
+  $: observable({ name: "Clicky" }),
+  foo() {
+    alert("Clicky:FOO");
+  },
+};
+function useMixin(mixin) {
+  const sym = Symbol();
+  // window.sym = sym;
+  return function (obj) {
+    obj[sym] = mixin;
+    return sym;
+  };
+}
+
+const useClicky = useMixin(Clicky);
+
+// console.log(useClicky({ a: "apple" }));
+
+// const Box = ((host = Object.create(null)) => {
+//   host.name = "box";
+//   console.log("this", host);
+//   const clicky = useClicky(host);
+//   return host;
+// })();
+
+function component(args) {
+  const host = Object.create(null, ...args);
+}
+
+// const Box = ((baseElement = HTMLElement) => {
+//   const host = Object.create(null);
+//   host.name = "box";
+//   console.log("this", host);
+//   const clicky = useClicky(host);
+//   return Object.assign(Object.create(null), baseElement, mixins, host);
+// })(mixins);
+
+// console.log(Box);
+
+// function Box() {
+//   useMixin(obj, Clicky);
+
+//   // return Object.assign(Object.create(null), obj, {
+//   //   foo: 4,
+//   //   // [isClicky]: Clicky,
+//   // });
+// }
+
+// // const Box = useMixin(Clicky, {
+// //   name: "Box",
+// // });
+
+// window.box = Box;
+// debugger;

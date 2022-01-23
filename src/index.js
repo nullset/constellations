@@ -101,8 +101,20 @@ const lifecycleMethods = [
 // const globalContext = new Set();
 // window.globalContext = globalContext;
 
+function mixin(name, logic) {
+  return {
+    symbol: Symbol(name),
+    mixin: Object.assign(Object.create(null), logic),
+  };
+}
+
+// == mixin ==
+// {symbol, logic, lifecycleMethods }
+// When building prototypeChain
+// { [symbol]: logic }
+
 function define(tagName, componentObj, options = {}) {
-  const { mixins = [], base = HTMLElement, extend = undefined } = options;
+  const { mixins = [], baseClass = HTMLElement, extend = undefined } = options;
 
   // Add a default mixin that creates observable attributes for `hidden` and `disabled`.
   let prototypeChain = [
@@ -138,7 +150,7 @@ function define(tagName, componentObj, options = {}) {
   });
 
   const componentStylesheets = constructStylesheets(prototypeChain);
-  class BlissElement extends base {
+  class BlissElement extends baseClass {
     $ = observable({});
     [isBlissElement] = true;
 
@@ -266,7 +278,7 @@ function define(tagName, componentObj, options = {}) {
         const converter = value.type || String;
         if (converter === Function) return;
 
-        // Set initial prop values base on default value of attr.
+        // Set initial prop values based on default value of prop.
         if (typeof this[prop] === "undefined") {
           this[prop] = this.typecastValue(converter, value.default);
         }
