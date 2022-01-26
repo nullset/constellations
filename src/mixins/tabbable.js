@@ -1,46 +1,53 @@
 import { observe, observable, raw } from "../index";
 
 export const tabsElementSymbol = Symbol("tabs");
-export const tabbableSymbol = Symbol("tabbable");
+export const self = Symbol("tabbable");
 
 export function tabbable(rootNode = "bliss-tabs") {
-  return {
-    props: {
-      active: { type: Boolean },
-    },
-    [tabsElementSymbol]: undefined,
-    constructorCallback() {
-      // Expose state back to composed object.
-      this[tabbableSymbol] = observable({});
-    },
-    connectedCallback() {
-      this[tabsElementSymbol] = this.closest(rootNode);
-      const nodeList = this[tabsElementSymbol].querySelectorAll(
-        `:scope > ${this.tagName}`
-      );
-      const nodes = Array.from(nodeList);
-      this[tabbableSymbol].index = nodes.findIndex((node) => node === this);
+  return [
+    self,
+    {
+      props: {
+        active: { type: Boolean },
+      },
+      [self]: {
+        constructorCallback() {
+          // Expose state back to composed object.
+          this[self].$ = observable({});
+        },
+        connectedCallback() {
+          this[self].tabsElement = this.closest(rootNode);
+          console.log(this[self]);
+          const nodeList = this[self].tabsElement.querySelectorAll(
+            `:scope > ${this.tagName}`
+          );
+          const nodes = Array.from(nodeList);
+          this[self].$.index = nodes.findIndex((node) => node === this);
 
-      observe(() => {
-        // If this.active is true, then set tabs.$activeTab to be this tab.
-        if (this.$.active)
-          this[tabsElementSymbol].$.activeTab = this[tabbableSymbol].index;
-      });
+          observe(() => {
+            // If this.active is true, then set tabs.$activeTab to be this tab.
+            if (this.$.active)
+              this[self].tabsElement.$.activeTab = this[self].$.index;
+          });
 
-      observe(() => {
-        // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
-        this.$.active =
-          this[tabsElementSymbol].$.activeTab === this[tabbableSymbol].index;
-      });
-    },
+          observe(() => {
+            // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
+            this.$.active =
+              this[self].tabsElement.$.activeTab === this[self].$.index;
+          });
+        },
 
-    disconnectedCallback() {
-      if (this[tabsElementSymbol].$.activeTab === this[tabbableSymbol].index)
-        this[tabsElementSymbol].$.activeTab = undefined;
-    },
+        disconnectedCallback() {
+          if (this[self].tabsElement.$.activeTab === this[self].$.index)
+            this[self].tabsElement.$.activeTab = undefined;
+        },
+      },
 
-    activeIsHost() {
-      debugger;
+      // [tabsElementSymbol]: undefined,
+
+      activeIsHost() {
+        debugger;
+      },
     },
-  };
+  ];
 }

@@ -113,25 +113,38 @@ function mixin(name, logic) {
 // When building prototypeChain
 // { [symbol]: logic }
 
-function define(tagName, componentObj, options = {}) {
-  const { mixins = [], baseClass = HTMLElement, extend = undefined } = options;
+function define(tagName, mixins, options = {}) {
+  const { baseClass = HTMLElement, extend = undefined } = options;
+
+  const mixinSymbols = new Set();
+  // console.log({ tagName, mixins, mixinSymbols });
+  // debugger;
 
   // Add a default mixin that creates observable attributes for `hidden` and `disabled`.
-  let prototypeChain = [
+  let prototypeChain = new Set([
     {
       props: {
         hidden: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
       },
     },
-    mixins,
-  ];
+    ...mixins.map((mixin) => {
+      if (Array.isArray(mixin)) {
+        const [sym, mix] = mixin;
+        mixinSymbols.add(sym);
+        return mix;
+      } else {
+        return mixin;
+      }
+    }),
+  ]);
 
   // Add the specified web component to the prototype chain.
-  prototypeChain.push(componentObj);
-  prototypeChain = prototypeChain.flat(Infinity);
+  // prototypeChain.push(componentObj);
+  prototypeChain = Array.from(prototypeChain);
   const flattenedPrototype = deepmerge.all(prototypeChain);
 
+  // TODO: Need to handle mixin pre-bound events
   const preBoundEvents = Object.keys(flattenedPrototype).reduce((acc, key) => {
     if (isAnEvent(key) && !lifecycleMethods.includes(key)) {
       acc.push(key.replace(eventRegex, "$1"));
@@ -139,23 +152,23 @@ function define(tagName, componentObj, options = {}) {
     return acc;
   }, []);
 
-  const observedAttrs = [];
-  const attributePropMap = {};
+  const observedAttrs = new Set();
+  const attributePropMap = new Map();
 
   Object.entries(flattenedPrototype.props).forEach((item) => {
     const [propName, { attribute }] = item;
     const attributeName = attribute || pascalCaseToSnakeCase(propName);
-    observedAttrs.push(attributeName);
-    attributePropMap[attributeName] = propName;
+    observedAttrs.add(attributeName);
+    attributePropMap.set(attributeName, propName);
   });
 
   const componentStylesheets = constructStylesheets(prototypeChain);
   class BlissElement extends baseClass {
-    $ = observable({});
+    $ = observable(Object.create(null));
     [isBlissElement] = true;
 
     static get observedAttributes() {
-      return observedAttrs;
+      return Array.from(observedAttrs);
     }
 
     handleEvent(e) {
@@ -256,7 +269,7 @@ function define(tagName, componentObj, options = {}) {
     attributeChangedCallback(name, oldValue, newValue) {
       if (super.attributeChangedCallback) super.attributeChangedCallback();
 
-      const propName = attributePropMap[name];
+      const propName = attributePropMap.get(name);
       this.setStateValue(propName, newValue);
       const { type = String } = flattenedPrototype.props[propName];
       let convertedValue = this.typecastValue(type, newValue);
@@ -378,32 +391,65 @@ function define(tagName, componentObj, options = {}) {
   }
 
   // Build up our web component's prototype.
-  prototypeChain.forEach((proto) => {
-    Object.entries(proto).forEach(([key, value]) => {
-      if (typeof value === typeof Function) {
-        if (lifecycleMethods.includes(key)) {
-          // if (!BlissElement.prototype[key]) BlissElement.prototype[key] = [];
-          // BlissElement.prototype[key].push(value);
-          const originalFn = BlissElement.prototype[key];
-          BlissElement.prototype[key] = function (args) {
-            if (originalFn) originalFn.call(this, args);
-            value.call(this, args);
-          };
-        } else if (isAnEvent(key)) {
-          // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
-          Object.defineProperty(BlissElement.prototype, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-          });
-        } else {
-          BlissElement.prototype[key] = value;
-        }
+  Reflect.ownKeys(flattenedPrototype).forEach((key) => {
+    const value = flattenedPrototype[key];
+    if (typeof key === "symbol") {
+      const mixinProto = value;
+      Reflect.ownKeys(mixinProto).forEach((key) => {
+        const value = mixinProto[key];
+        buildProperty(key, value);
+      });
+    } else {
+      buildProperty(key, value);
+    }
+    console.log({ key, typeof: typeof key, value });
+
+    // if (typeof value === typeof Function) {
+    //   if (lifecycleMethods.includes(key)) {
+    //     // if (!BlissElement.prototype[key]) BlissElement.prototype[key] = [];
+    //     // BlissElement.prototype[key].push(value);
+    //     const originalFn = BlissElement.prototype[key];
+    //     BlissElement.prototype[key] = function (args) {
+    //       if (originalFn) originalFn.call(this, args);
+    //       value.call(this, args);
+    //     };
+    //   } else if (isAnEvent(key)) {
+    //     // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
+    //     Object.defineProperty(BlissElement.prototype, key, {
+    //       value: value,
+    //       enumerable: true,
+    //       configurable: true,
+    //     });
+    //   } else {
+    //     BlissElement.prototype[key] = value;
+    //   }
+    // } else {
+    //   BlissElement.prototype[key] = value;
+    // }
+  });
+
+  function buildProperty(key, value) {
+    if (typeof value === typeof Function) {
+      if (lifecycleMethods.includes(key)) {
+        const originalFn = BlissElement.prototype[key];
+        BlissElement.prototype[key] = function (args) {
+          if (originalFn) originalFn.call(this, args);
+          value.call(this, args);
+        };
+      } else if (isAnEvent(key)) {
+        // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
+        Object.defineProperty(BlissElement.prototype, key, {
+          value: value,
+          enumerable: true,
+          configurable: true,
+        });
       } else {
         BlissElement.prototype[key] = value;
       }
-    });
-  });
+    } else {
+      BlissElement.prototype[key] = value;
+    }
+  }
 
   // Create getter/setter for any observed attribute, and make `$[prop] === this[prop]`.
   Object.keys(flattenedPrototype.props).forEach((key) => {
