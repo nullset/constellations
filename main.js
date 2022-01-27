@@ -125,5 +125,8 @@ const MyElem = {
   render() {
     return html`<div>My elem: ${this.$[foobaleSym].test}</div>`;
   },
+  onclick() {
+    this.$[foobaleSym].test = this.$[foobaleSym].test + 1;
+  },
 };
 define("my-elem", [fooable(), MyElem]);

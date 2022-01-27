@@ -24,6 +24,9 @@ export function fooable() {
           this.$[self].test = 44;
           console.log("connectedCallback: fooable");
         },
+        onclick() {
+          alert("Fooable clicked");
+        },
       },
     },
   ];

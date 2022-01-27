@@ -395,40 +395,17 @@ function define(tagName, mixins, options = {}) {
     const value = flattenedPrototype[key];
     if (typeof key === "symbol") {
       const mixinProto = value;
-      Reflect.ownKeys(mixinProto).forEach((key) => {
-        const value = mixinProto[key];
-        buildProperty(key, value);
+      Reflect.ownKeys(mixinProto).forEach((mixinKey) => {
+        const value = mixinProto[mixinKey];
+        buildProperty({ key: mixinKey, value, symbol: key });
       });
     } else {
-      buildProperty(key, value);
+      buildProperty({ key, value });
     }
-    console.log({ key, typeof: typeof key, value });
-
-    // if (typeof value === typeof Function) {
-    //   if (lifecycleMethods.includes(key)) {
-    //     // if (!BlissElement.prototype[key]) BlissElement.prototype[key] = [];
-    //     // BlissElement.prototype[key].push(value);
-    //     const originalFn = BlissElement.prototype[key];
-    //     BlissElement.prototype[key] = function (args) {
-    //       if (originalFn) originalFn.call(this, args);
-    //       value.call(this, args);
-    //     };
-    //   } else if (isAnEvent(key)) {
-    //     // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
-    //     Object.defineProperty(BlissElement.prototype, key, {
-    //       value: value,
-    //       enumerable: true,
-    //       configurable: true,
-    //     });
-    //   } else {
-    //     BlissElement.prototype[key] = value;
-    //   }
-    // } else {
-    //   BlissElement.prototype[key] = value;
-    // }
   });
 
-  function buildProperty(key, value) {
+  function buildProperty({ key, value, symbol }) {
+    console.log({ key, value, symbol });
     if (typeof value === typeof Function) {
       if (lifecycleMethods.includes(key)) {
         const originalFn = BlissElement.prototype[key];
@@ -437,7 +414,18 @@ function define(tagName, mixins, options = {}) {
           value.call(this, args);
         };
       } else if (isAnEvent(key)) {
+        // If a mixin has an event defined on it, simply ignore it. The event will need to be moved
+        // outside of the symbol namespaced area, or, alternately, simply named something else and then
+        // called within the `on[event]` method outside the symbol namespaced area.
+        if (symbol) {
+          console.warn(
+            `Mixin ${symbol.toString()} has event "${key}" defined within its namespace. Events can only be defined outside of namespaced sections. Please move the event to the non-namespaced section of the mixin.`
+          );
+          return;
+        }
+
         // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
+
         Object.defineProperty(BlissElement.prototype, key, {
           value: value,
           enumerable: true,
