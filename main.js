@@ -110,7 +110,8 @@ import { html, define, observe, observable, raw } from "./src/index";
 // // });
 // define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
-import { self as foobaleSym, fooable } from "./src/mixins/fooable";
+import { self as fooableSym, fooable } from "./src/mixins/fooable";
+window.fb = fooableSym;
 
 const MyElem = {
   props: {
@@ -123,10 +124,18 @@ const MyElem = {
     console.log("connectedCallback: MyElem");
   },
   render() {
-    return html`<div>My elem: ${this.$[foobaleSym].test}</div>`;
+    return html`<div>My elem: ${this.$[fooableSym].test}</div>`;
   },
   onclick() {
-    this.$[foobaleSym].test = this.$[foobaleSym].test + 1;
+    this.$[fooableSym].test = this.$[fooableSym].test + 1;
   },
 };
 define("my-elem", [fooable(), MyElem]);
+
+const OtherElem = {
+  render() {
+    const state = this.previousElementSibling.$;
+    return html`Other: ${state[fooableSym].test}`;
+  },
+};
+define("other-elem", [OtherElem]);

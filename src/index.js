@@ -6,6 +6,15 @@ import deepmerge from "deepmerge";
 import "construct-style-sheets-polyfill"; // Non-Chromium
 import "@ungap/custom-elements"; // Safari
 
+// const Stars = new WeakMap();
+// window.Stars = Stars;
+// const Astrid = new WeakMap();
+// window.Astrid = Astrid;
+const Constellations = new Map();
+window.Constellations = Constellations;
+
+// TODO: We need to determine when a constellation will be defined. At connectedCallback is most likely. If that's the case though, then we need to cache it so it's not found on a second connectedCallback (say because the element is moved) then we don't end up with an empty state.
+
 // Hidden variables
 const isBlissElement = Symbol("isBlissElement");
 const componentHasLoaded = Symbol("componentHasLoaded");
@@ -165,6 +174,9 @@ function define(tagName, mixins, options = {}) {
   const componentStylesheets = constructStylesheets(prototypeChain);
   class BlissElement extends baseClass {
     $ = observable(Object.create(null));
+
+    foo = 4;
+
     [isBlissElement] = true;
 
     static get observedAttributes() {
@@ -178,6 +190,8 @@ function define(tagName, mixins, options = {}) {
     constructor() {
       super();
 
+      this.createConstellation();
+
       // // Convert attr prop values to correct typecast values.
       // Object.values(attributePropMap).forEach((propName) => {
       //   this.setStateValue(propName, this[propName]);
@@ -190,6 +204,38 @@ function define(tagName, mixins, options = {}) {
       this.bindEvents();
       if (this.constructorCallback) this.constructorCallback();
       this[componentHasLoaded] = false;
+    }
+
+    createConstellation() {
+      if (!Constellations.has(this.$)) {
+        Constellations.set(this.$, new Set([this]));
+      }
+    }
+
+    constellate({ key, element }) {
+      if (typeof key !== "symbol")
+        console.error(new Error("`key` argument must be a Symbol."));
+      if (!element) console.error(new Error("Element could not be found."));
+
+      if (element.$) {
+        this.$[key] = element.$;
+        Constellations.get(element.$).add(this);
+      } else {
+        console.error(
+          new Error("Element specified is not a constellation element.")
+        );
+      }
+    }
+
+    supernova() {
+      const entries = Constellations.entries();
+      for (let [key, asterism] of entries) {
+        asterism.delete(this);
+
+        if (Constellations.get(key).size === 0) {
+          Constellations.delete(key);
+        }
+      }
     }
 
     setStateValue(name, value) {
@@ -212,6 +258,8 @@ function define(tagName, mixins, options = {}) {
     connectedCallback() {
       if (super.connectedCallback) super.connectedCallback();
 
+      this.createConstellation();
+
       // Set implicit slot name.
       this.slot =
         this.getAttribute("is") ||
@@ -230,6 +278,8 @@ function define(tagName, mixins, options = {}) {
     disconnectedCallback() {
       if (super.disconnectedCallback) super.disconnectedCallback();
       this.fireEvent("disconnectedCallback");
+
+      this.supernova();
     }
 
     adoptedCallback() {
