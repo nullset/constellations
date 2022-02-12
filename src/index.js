@@ -172,6 +172,9 @@ function define(tagName, mixins, options = {}) {
   });
 
   const componentStylesheets = constructStylesheets(prototypeChain);
+
+  const createConstellationSym = Symbol("createConstellation");
+  const supernovaSym = Symbol("supernova");
   class BlissElement extends baseClass {
     $ = observable(Object.create(null));
 
@@ -190,7 +193,7 @@ function define(tagName, mixins, options = {}) {
     constructor() {
       super();
 
-      this.createConstellation();
+      this[createConstellationSym]();
 
       // // Convert attr prop values to correct typecast values.
       // Object.values(attributePropMap).forEach((propName) => {
@@ -206,12 +209,14 @@ function define(tagName, mixins, options = {}) {
       this[componentHasLoaded] = false;
     }
 
-    createConstellation() {
+    // Create a constellation of all elements which reference the internal state of this element.
+    [createConstellationSym]() {
       if (!Constellations.has(this.$)) {
         Constellations.set(this.$, new Set([this]));
       }
     }
 
+    // Associate a specific element's state with unique symbol, and store that reference within `this` element's state.
     constellate({ key, element }) {
       if (typeof key !== "symbol")
         console.error(new Error("`key` argument must be a Symbol."));
@@ -227,7 +232,11 @@ function define(tagName, mixins, options = {}) {
       }
     }
 
-    supernova() {
+    // Delete this element from any constellation whose state the element was referencing.
+    // Ensures that if no element is using an constellation's state, then the constellation is
+    // destroyed. This prevents memory leaks when elements are being created/destroyed and
+    // sharing lots of data.
+    [supernovaSym]() {
       const entries = Constellations.entries();
       for (let [key, asterism] of entries) {
         asterism.delete(this);
@@ -258,7 +267,7 @@ function define(tagName, mixins, options = {}) {
     connectedCallback() {
       if (super.connectedCallback) super.connectedCallback();
 
-      this.createConstellation();
+      this[createConstellationSym]();
 
       // Set implicit slot name.
       this.slot =
@@ -279,7 +288,7 @@ function define(tagName, mixins, options = {}) {
       if (super.disconnectedCallback) super.disconnectedCallback();
       this.fireEvent("disconnectedCallback");
 
-      this.supernova();
+      this[supernovaSym]();
     }
 
     adoptedCallback() {
