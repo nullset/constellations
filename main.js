@@ -134,8 +134,11 @@ define("my-elem", [fooable(), MyElem]);
 
 const myElemSym = Symbol("MyElem");
 const OtherElem = {
+  props: {
+    name: { type: String, default: "OtherElem" },
+  },
   connectedCallback() {
-    this.constellate({ key: myElemSym, element: this.previousElementSibling });
+    this.constellate({ key: "MyElem", element: this.previousElementSibling });
   },
   render() {
     const state = this.previousElementSibling.$;

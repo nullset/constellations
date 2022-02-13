@@ -218,9 +218,15 @@ function define(tagName, mixins, options = {}) {
 
     // Associate a specific element's state with unique symbol, and store that reference within `this` element's state.
     constellate({ key, element }) {
-      if (typeof key !== "symbol")
-        console.error(new Error("`key` argument must be a Symbol."));
-      if (!element) console.error(new Error("Element could not be found."));
+      if (key in this.$)
+        throw new Error(
+          "Constellation cannot be created: Key already exists in state.\nPlease specify a different name for the key, or, alternately, use a Symbol instead for truly unique names."
+        );
+
+      if (!element)
+        throw new Error(
+          "Constellation cannot be created: Element could not be found."
+        );
 
       if (element.$) {
         this.$[key] = element.$;
