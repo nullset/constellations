@@ -146,3 +146,105 @@ const OtherElem = {
   },
 };
 define("other-elem", [OtherElem]);
+
+const ThirdElem = {
+  props: {
+    name: { type: String, default: "ThirdElem" },
+  },
+  connectedCallback() {
+    // this.constellate({ key: "MyElem", element: this.previousElementSibling });
+  },
+  render() {
+    // const state = this.previousElementSibling.$;
+    return html`Third ELEM `;
+  },
+};
+define("third-elem", [OtherElem, ThirdElem]);
+
+const EverythingElem = {
+  props: {
+    slot: { type: String, default: undefined },
+    bar: { type: Number, default: 33 },
+  },
+  connectedCallback() {
+    this.$.monkey = "Ceasar";
+  },
+  handleSlotChange(e) {
+    function myTag(strings, ...placeholders) {
+      debugger;
+    }
+
+    const host = e.target.getRootNode().host;
+
+    e.target.assignedElements().forEach((template) => {
+      const clone = template.content.cloneNode(true);
+      const xs = clone.querySelectorAll("x");
+      xs.forEach((x) => {
+        let text = x.innerText.trim();
+        text = /^return\s/.test(text) ? text : `return ${text}`;
+        const func = new Function("html", text);
+        const elems = func.call(host, html);
+        elems ? x.replaceWith(elems) : x.remove();
+      });
+
+      host.appendChild(clone);
+    });
+
+    // e.target.assignedElements().forEach((template) => {
+    //   debugger;
+    //   const clone = template.content.cloneNode(true);
+    //   let walker = document.createTreeWalker(clone, NodeFilter.SHOW_ALL);
+
+    //   let node = walker.firstNode();
+
+    //   // const scripts = clone.querySelectorAll("script");
+    //   // Array.from(scripts).map((script) => {
+    //   //   // myTag`${myTag`script.text)}`;
+    //   //   // const func = new Function("`${script.text}`");
+    //   //   // console.log(myTag(func.call(this)));
+    //   //   // const h = html.call(script.text);
+    //   //   const text = myTag`${script.text}`;
+    //   //   debugger;
+    //   //   // // const func = new Function(script.text);
+    //   //   // script.text = `
+    //   //   //   const script = document.currentScript;
+    //   //   //   const host = script.getRootNode().host;
+    //   //   //   debugger;
+    //   //   //   const func = new Function(${script.text});
+    //   //   //   func.call(host);
+    //   //   //   alert(1);
+    //   //   // `;
+    //   //   // return script;
+    //   // });
+
+    //   // debugger;
+    //   // host.append(clone);
+    // });
+  },
+  handleScriptSlotChange(e) {
+    // function myTag(strings, ...placeholders) {
+    //   const N = placeholders.length;
+    //   let out = '';
+    //   for (let i=0; i<N;i++) {
+    //    out += strings[i] + placeholders[i];
+    //   }
+    //   out += strings[N];
+    //   return out;
+    // }
+
+    const host = e.target.getRootNode().host;
+
+    const script = e.target.assignedElements()[0].text;
+    // const func = new Function("env", script)(this);
+    const func = new Function(script);
+    func.call(host);
+  },
+  render() {
+    return html`
+      <slot name="render" onslotchange=${this.handleSlotChange}></slot>
+      <slot name="script" onslotchange=${this.handleScriptSlotChange}></slot>
+      <slot></slot>
+    `;
+  },
+};
+define("e-e", [EverythingElem]);

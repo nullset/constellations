@@ -7,6 +7,9 @@
     <title>Vite App</title>
     <script type="module" src="/main.js"></script>
     <style>
+      html {
+        background: lightslategray;
+      }
       *:not(:defined) {
         display: none;
       }
@@ -15,6 +18,24 @@
   <body>
     <my-elem>MY ELEM</my-elem>
     <other-elem>Other</other-elem>
+    <third-elem> Third </third-elem>
+
+    <e-e>
+      <template slot="render">
+        <p class="para" data-blah="bing">
+          everything
+          <b>
+            apple
+            <x>alert()</x>
+            <x>this.$.monkey</x>
+            cat
+          </b>
+        </p>
+      </template>
+      <script type="script" slot="script">
+        console.log(this);
+      </script>
+    </e-e>
 
     <bliss-tabs>
       <bliss-tab>One</bliss-tab>
