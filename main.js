@@ -138,7 +138,7 @@ const OtherElem = {
     name: { type: String, default: "OtherElem" },
   },
   connectedCallback() {
-    this.constellate({ key: "MyElem", element: this.previousElementSibling });
+    this.cluster({ key: "MyElem", element: this.previousElementSibling });
   },
   render() {
     const state = this.previousElementSibling.$;
@@ -152,7 +152,7 @@ const ThirdElem = {
     name: { type: String, default: "ThirdElem" },
   },
   connectedCallback() {
-    // this.constellate({ key: "MyElem", element: this.previousElementSibling });
+    // this.cluster({ key: "MyElem", element: this.previousElementSibling });
   },
   render() {
     // const state = this.previousElementSibling.$;
@@ -170,39 +170,62 @@ const EverythingElem = {
     this.$.monkey = "Ceasar";
   },
   handleSlotChange(e) {
-    function myTag(strings, ...placeholders) {
-      debugger;
-    }
-
     const host = e.target.getRootNode().host;
+    const script = host.querySelector('[slot="script"]');
+    const frag = new DocumentFragment();
+    let text = script.innerText.trim();
+    const func = new Function("html", `return ${text};`);
+    observe(() => {
+      const elems = func.call(host, html);
 
-    e.target.assignedElements().forEach((template) => {
-      const clone = template.content.cloneNode(true);
-      const xs = clone.querySelectorAll("x");
-      xs.forEach((x) => {
-        let text = x.innerText.trim();
-        text = /^return\s/.test(text) ? text : `return ${text}`;
-        const func = new Function("html", text);
-        // const elems = func.call(host, html);
-        // elems ? x.replaceWith(elems) : x.remove();
-
-        observe(() => {
-          let text = x.innerText.trim();
-          text = /^return\s/.test(text) ? text : `return ${text}`;
-          // debugger;
-          const elems = func.call(host, html);
-          // debugger;
-          // elems ? x.replaceWith(elems) : x.remove();
-          render(x, html`<div>${elems}</div>`);
-        });
-        // observe(() => {
-        //   elems ? x.replaceWith(elems) : x.remove();
-        // });
-      });
-
-      host.appendChild(clone);
+      render(frag, elems);
     });
+    debugger;
+    host.append(frag);
 
+    // e.target.assignedNodes().forEach((node) => {
+    //   if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "SCRIPT") {
+    //     const frag = new DocumentFragment();
+    //     let text = node.innerText.trim();
+    //     const func = new Function("html", `return ${text};`);
+    //     const elems = func.call(host, html);
+
+    //     render(frag, elems);
+    //     debugger;
+    //   } else {
+    //     node.remove();
+    //   }
+    // });
+
+    // ----------------------------------------------------------
+    // e.target.assignedElements().forEach((template) => {
+    //   const clone = template.content.cloneNode(true);
+    //   const xs = clone.querySelectorAll("x");
+    //   xs.forEach((x) => {
+    //     let text = x.innerText.trim();
+    //     text = /^return\s/.test(text) ? text : `return ${text}`;
+    //     const func = new Function("html", text);
+    //     // const elems = func.call(host, html);
+    //     // elems ? x.replaceWith(elems) : x.remove();
+
+    //     observe(() => {
+    //       let text = x.innerText.trim();
+    //       text = /^return\s/.test(text) ? text : `return ${text}`;
+    //       // debugger;
+    //       const elems = func.call(host, html);
+    //       // debugger;
+    //       // elems ? x.replaceWith(elems) : x.remove();
+    //       render(x, html`<div>${elems}</div>`);
+    //     });
+    //     // observe(() => {
+    //     //   elems ? x.replaceWith(elems) : x.remove();
+    //     // });
+    //   });
+
+    //   host.appendChild(clone);
+    // });
+
+    // -------------------------------------------------------
     // e.target.assignedElements().forEach((template) => {
     //   debugger;
     //   const clone = template.content.cloneNode(true);
@@ -254,8 +277,7 @@ const EverythingElem = {
   },
   render() {
     return html`
-      <slot name="render" onslotchange=${this.handleSlotChange}></slot>
-      <slot name="script" onslotchange=${this.handleScriptSlotChange}></slot>
+      <slot name="script" onslotchange=${this.handleSlotChange}></slot>
       <slot></slot>
     `;
   },

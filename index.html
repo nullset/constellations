@@ -20,7 +20,7 @@
     <other-elem>Other</other-elem>
     <third-elem> Third </third-elem>
 
-    <e-e>
+    <e2-e>
       <template slot="render">
         <p class="para" data-blah="bing">
           everything
@@ -35,6 +35,12 @@
       </template>
       <script type="script" slot="script">
         console.log(this);
+      </script>
+    </e2-e>
+
+    <e-e>
+      <script slot="script" type="foo">
+        html`<p>${this.$.monkey} <b>${this.$.foo}</b></p>`;
       </script>
     </e-e>
 
