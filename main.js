@@ -1,4 +1,4 @@
-import { html, define, observe, observable, raw } from "./src/index";
+import { html, define, observe, observable, raw, render } from "./src/index";
 // import {
 //   symbol as keyboardNavigableSymbol,
 //   mixin as keyboardNavigable,
@@ -183,8 +183,21 @@ const EverythingElem = {
         let text = x.innerText.trim();
         text = /^return\s/.test(text) ? text : `return ${text}`;
         const func = new Function("html", text);
-        const elems = func.call(host, html);
-        elems ? x.replaceWith(elems) : x.remove();
+        // const elems = func.call(host, html);
+        // elems ? x.replaceWith(elems) : x.remove();
+
+        observe(() => {
+          let text = x.innerText.trim();
+          text = /^return\s/.test(text) ? text : `return ${text}`;
+          // debugger;
+          const elems = func.call(host, html);
+          // debugger;
+          // elems ? x.replaceWith(elems) : x.remove();
+          render(x, html`<div>${elems}</div>`);
+        });
+        // observe(() => {
+        //   elems ? x.replaceWith(elems) : x.remove();
+        // });
       });
 
       host.appendChild(clone);

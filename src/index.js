@@ -524,7 +524,7 @@ function define(tagName, mixins, options = {}) {
   customElements.define(tagName, BlissElement, { extends: extend });
 }
 
-export { define, html, svg, observable, observe, raw };
+export { define, html, svg, observable, observe, raw, render };
 
 // TODO: Need to ensure that:
 // 1) Mixin methods can be overriden
