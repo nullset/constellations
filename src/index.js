@@ -385,7 +385,10 @@ function define(tagName, mixins, options = {}) {
         });
 
         // Set inintial default values.
-        this.$[prop] = flattenedPrototype.props[prop].default;
+        this.$[prop] =
+          typeof this[prop] === "undefined"
+            ? flattenedPrototype.props[prop].default
+            : this[prop];
       });
     }
 
