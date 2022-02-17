@@ -161,10 +161,14 @@ const ThirdElem = {
 };
 define("third-elem", [OtherElem, ThirdElem]);
 
+const cacheSym = Symbol("cacheSym");
 const EverythingElem = {
   props: {
     slot: { type: String, default: undefined },
     bar: { type: Number, default: 33 },
+  },
+  constructorCallback() {
+    this[cacheSym] = undefined;
   },
   connectedCallback() {
     this.$.monkey = "Ceasar";
@@ -172,16 +176,28 @@ const EverythingElem = {
   handleSlotChange(e) {
     const host = e.target.getRootNode().host;
     const script = host.querySelector('[slot="script"]');
+    if (!script) return;
+
+    const text = script.innerText.trim();
+
+    // If the script's text hasn't been updated, no need to re-render.
+    if (this[cacheSym] === text) {
+      script.remove();
+      return;
+    }
+
+    // The script's text HAS been updated, so throw away existing DOM and re-render.
+    // Note that state is maintained across re-rerenders, even if DOM is not.
+    this[cacheSym] = text;
+
     const frag = new DocumentFragment();
-    let text = script.innerText.trim();
     const func = new Function("html", `return ${text};`);
     observe(() => {
       const elems = func.call(host, html);
 
       render(frag, elems);
     });
-    debugger;
-    host.append(frag);
+    host.replaceChildren(frag);
 
     // e.target.assignedNodes().forEach((node) => {
     //   if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "SCRIPT") {
