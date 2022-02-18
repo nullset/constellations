@@ -163,6 +163,7 @@ import { html, define, observe, observable, raw, render } from "./src/index";
 
 const cacheSym = Symbol("cacheSym");
 const EverythingElem = {
+  shadowClosed: true,
   props: {
     slot: { type: String, default: undefined },
     isolate: { type: Boolean, default: false },
@@ -201,7 +202,10 @@ const EverythingElem = {
     });
 
     if (host.isolate) {
-      const defaultSlot = host.shadowRoot.querySelector("slot:not([name])");
+      debugger;
+      const defaultSlot = e.target
+        .getRootNode()
+        .querySelector("slot:not([name])");
       defaultSlot.replaceChildren(frag);
       // Mut remove all innerHTML content or the shadow DOM default will not show.
       host.innerHTML = "";

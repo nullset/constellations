@@ -395,7 +395,9 @@ function define(tagName, mixins, options = {}) {
     renderToRoot() {
       if (this.shadow === false || !this.render) return;
 
-      let rootNode = this.shadowRoot || this.attachShadow({ mode: "open" });
+      let rootNode =
+        this.shadowRoot ||
+        this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
       rootNode.adoptedStyleSheets = componentStylesheets;
 
       observe(async () => {
