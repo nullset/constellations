@@ -38,9 +38,19 @@
       </script>
     </e2-e>
 
+    <e-e isolate>
+      <script slot="script">
+        () =>
+          html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
+        // alert(1);
+      </script>
+    </e-e>
+
     <e-e>
-      <script slot="script" type="foo">
-        html`<p>${this.$.monkey} <b>${this.$.foo}</b></p>`;
+      <script slot="script">
+        () =>
+          html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
+        // alert(1);
       </script>
     </e-e>
 

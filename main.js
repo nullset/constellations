@@ -110,61 +110,62 @@ import { html, define, observe, observable, raw, render } from "./src/index";
 // // });
 // define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
-import { self as fooableSym, fooable } from "./src/mixins/fooable";
-window.fb = fooableSym;
+// import { self as fooableSym, fooable } from "./src/mixins/fooable";
+// window.fb = fooableSym;
 
-const MyElem = {
-  props: {
-    name: { type: String, default: "MySuperElem" },
-  },
-  constructorCallback() {
-    console.log("constructorCallback: MyElem");
-  },
-  connectedCallback() {
-    console.log("connectedCallback: MyElem");
-  },
-  render() {
-    return html`<div>My elem: ${this.$[fooableSym].test}</div>`;
-  },
-  onclick() {
-    this.$[fooableSym].test = this.$[fooableSym].test + 1;
-  },
-};
-define("my-elem", [fooable(), MyElem]);
+// const MyElem = {
+//   props: {
+//     name: { type: String, default: "MySuperElem" },
+//   },
+//   constructorCallback() {
+//     console.log("constructorCallback: MyElem");
+//   },
+//   connectedCallback() {
+//     console.log("connectedCallback: MyElem");
+//   },
+//   render() {
+//     return html`<div>My elem: ${this.$[fooableSym].test}</div>`;
+//   },
+//   onclick() {
+//     this.$[fooableSym].test = this.$[fooableSym].test + 1;
+//   },
+// };
+// define("my-elem", [fooable(), MyElem]);
 
-const myElemSym = Symbol("MyElem");
-const OtherElem = {
-  props: {
-    name: { type: String, default: "OtherElem" },
-  },
-  connectedCallback() {
-    this.cluster({ key: "MyElem", element: this.previousElementSibling });
-  },
-  render() {
-    const state = this.previousElementSibling.$;
-    return html`Other: ${state[fooableSym].test}`;
-  },
-};
-define("other-elem", [OtherElem]);
+// const myElemSym = Symbol("MyElem");
+// const OtherElem = {
+//   props: {
+//     name: { type: String, default: "OtherElem" },
+//   },
+//   connectedCallback() {
+//     this.cluster({ key: "MyElem", element: this.previousElementSibling });
+//   },
+//   render() {
+//     const state = this.previousElementSibling.$;
+//     return html`Other: ${state[fooableSym].test}`;
+//   },
+// };
+// define("other-elem", [OtherElem]);
 
-const ThirdElem = {
-  props: {
-    name: { type: String, default: "ThirdElem" },
-  },
-  connectedCallback() {
-    // this.cluster({ key: "MyElem", element: this.previousElementSibling });
-  },
-  render() {
-    // const state = this.previousElementSibling.$;
-    return html`Third ELEM `;
-  },
-};
-define("third-elem", [OtherElem, ThirdElem]);
+// const ThirdElem = {
+//   props: {
+//     name: { type: String, default: "ThirdElem" },
+//   },
+//   connectedCallback() {
+//     // this.cluster({ key: "MyElem", element: this.previousElementSibling });
+//   },
+//   render() {
+//     // const state = this.previousElementSibling.$;
+//     return html`Third ELEM `;
+//   },
+// };
+// define("third-elem", [OtherElem, ThirdElem]);
 
 const cacheSym = Symbol("cacheSym");
 const EverythingElem = {
   props: {
     slot: { type: String, default: undefined },
+    isolate: { type: Boolean, default: false },
     bar: { type: Number, default: 33 },
   },
   constructorCallback() {
@@ -174,8 +175,9 @@ const EverythingElem = {
     this.$.monkey = "Ceasar";
   },
   handleSlotChange(e) {
-    const host = e.target.getRootNode().host;
-    const script = host.querySelector('[slot="script"]');
+    const script = e.target
+      .assignedElements()
+      .find((e) => e.tagName === "SCRIPT");
     if (!script) return;
 
     const text = script.innerText.trim();
@@ -190,107 +192,29 @@ const EverythingElem = {
     // Note that state is maintained across re-rerenders, even if DOM is not.
     this[cacheSym] = text;
 
+    const host = e.target.getRootNode().host;
     const frag = new DocumentFragment();
     const func = new Function("html", `return ${text};`);
     observe(() => {
       const elems = func.call(host, html);
-
-      render(frag, elems);
+      if (elems) render(frag, elems);
     });
-    host.replaceChildren(frag);
 
-    // e.target.assignedNodes().forEach((node) => {
-    //   if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "SCRIPT") {
-    //     const frag = new DocumentFragment();
-    //     let text = node.innerText.trim();
-    //     const func = new Function("html", `return ${text};`);
-    //     const elems = func.call(host, html);
-
-    //     render(frag, elems);
-    //     debugger;
-    //   } else {
-    //     node.remove();
-    //   }
-    // });
-
-    // ----------------------------------------------------------
-    // e.target.assignedElements().forEach((template) => {
-    //   const clone = template.content.cloneNode(true);
-    //   const xs = clone.querySelectorAll("x");
-    //   xs.forEach((x) => {
-    //     let text = x.innerText.trim();
-    //     text = /^return\s/.test(text) ? text : `return ${text}`;
-    //     const func = new Function("html", text);
-    //     // const elems = func.call(host, html);
-    //     // elems ? x.replaceWith(elems) : x.remove();
-
-    //     observe(() => {
-    //       let text = x.innerText.trim();
-    //       text = /^return\s/.test(text) ? text : `return ${text}`;
-    //       // debugger;
-    //       const elems = func.call(host, html);
-    //       // debugger;
-    //       // elems ? x.replaceWith(elems) : x.remove();
-    //       render(x, html`<div>${elems}</div>`);
-    //     });
-    //     // observe(() => {
-    //     //   elems ? x.replaceWith(elems) : x.remove();
-    //     // });
-    //   });
-
-    //   host.appendChild(clone);
-    // });
-
-    // -------------------------------------------------------
-    // e.target.assignedElements().forEach((template) => {
-    //   debugger;
-    //   const clone = template.content.cloneNode(true);
-    //   let walker = document.createTreeWalker(clone, NodeFilter.SHOW_ALL);
-
-    //   let node = walker.firstNode();
-
-    //   // const scripts = clone.querySelectorAll("script");
-    //   // Array.from(scripts).map((script) => {
-    //   //   // myTag`${myTag`script.text)}`;
-    //   //   // const func = new Function("`${script.text}`");
-    //   //   // console.log(myTag(func.call(this)));
-    //   //   // const h = html.call(script.text);
-    //   //   const text = myTag`${script.text}`;
-    //   //   debugger;
-    //   //   // // const func = new Function(script.text);
-    //   //   // script.text = `
-    //   //   //   const script = document.currentScript;
-    //   //   //   const host = script.getRootNode().host;
-    //   //   //   debugger;
-    //   //   //   const func = new Function(${script.text});
-    //   //   //   func.call(host);
-    //   //   //   alert(1);
-    //   //   // `;
-    //   //   // return script;
-    //   // });
-
-    //   // debugger;
-    //   // host.append(clone);
-    // });
+    if (host.isolate) {
+      const defaultSlot = host.shadowRoot.querySelector("slot:not([name])");
+      defaultSlot.replaceChildren(frag);
+      // Mut remove all innerHTML content or the shadow DOM default will not show.
+      host.innerHTML = "";
+    } else {
+      host.replaceChildren(frag);
+    }
   },
-  handleScriptSlotChange(e) {
-    // function myTag(strings, ...placeholders) {
-    //   const N = placeholders.length;
-    //   let out = '';
-    //   for (let i=0; i<N;i++) {
-    //    out += strings[i] + placeholders[i];
-    //   }
-    //   out += strings[N];
-    //   return out;
-    // }
-
-    const host = e.target.getRootNode().host;
-
-    const script = e.target.assignedElements()[0].text;
-    // const func = new Function("env", script)(this);
-    const func = new Function(script);
-    func.call(host);
-  },
+  styles: `
+    :host([isolate]) *, :host([isolate]) *::before, :host([isolate]) *::after {
+      all: initial;
+      box-sizing: border-box;
+    }
+  `,
   render() {
     return html`
       <slot name="script" onslotchange=${this.handleSlotChange}></slot>
