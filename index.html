@@ -76,9 +76,9 @@
         <script slot="script">
           document.currentScript.$ = {
             connectedCallback() {
-              setInterval(() => {
-                this.$.bar++;
-              }, 1000);
+              //   setInterval(() => {
+              //     this.$.bar++;
+              //   }, 1000);
             },
             render(html) {
               return html`<p>${this.$.bar}</p>`;

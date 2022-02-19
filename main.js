@@ -241,71 +241,40 @@ const R2 = {
     console.log("R2 - connected callback");
   },
   handleSlotChange(e) {
-    const host = e.target.getRootNode().host;
     const script = e.target
       .assignedElements()
       .find((e) => e.tagName === "SCRIPT");
     if (!script) return;
 
-    const $obj = script.$;
+    const host = e.target.getRootNode().host;
+    const instanceProto = script.$;
     script.remove();
 
     // Apply instance lifecyles to host element. Necessary in case host is ever disconnected/re-connected.
-    host.setInstanceLifecycles($obj);
+    host.setInstanceLifecycles(instanceProto);
 
     // Fire any "connected" or "component" lifecyle method if the component is connected to the page, as these would have been fired by mounting the component.
     if (host.isConnected) {
-      Object.entries($obj).forEach(([key, fn]) => {
-        if (/^(connected|component)/.test(key)) fn.call(host);
+      [
+        "constructorCallback",
+        "connectedCallback",
+        "componentWillRender",
+        "componentWillRenderOnce",
+        "render",
+        "componentDidRender",
+        "componentDidRenderOnce",
+      ].forEach((lifecyleMethod) => {
+        if (instanceProto[lifecyleMethod]) {
+          if (lifecyleMethod === "render") {
+            observe(() =>
+              render(host, instanceProto[lifecyleMethod].call(host, html))
+            );
+          } else {
+            instanceProto[lifecyleMethod].call(host);
+          }
+        }
       });
-
-      // Set up render based on observables.
-      if ($obj.render) {
-        observe(() => render(host, $obj.render.call(host, html)));
-      }
     }
-    return;
-
-    // const text = script.innerText.trim();
-    // script.remove();
-
-    // // If the script's text hasn't been updated, no need to re-render.
-    // if (this[cacheSym] === text) {
-    //   return;
-    // }
-
-    // // The script's text HAS been updated, so throw away existing object and re-render.
-    // this[cacheSym] = text;
-
-    // const host = e.target.getRootNode().host;
-
-    // const func = new Function("html", "observe", `return ${text};`);
-
-    // const obj = func.call(host, html, observe);
-
-    // host.connectedCallback = () => {
-    //   host.connectedCallback();
-    //   obj.connectedCallback();
-    // };
-    // debugger;
-
-    // const frag = new DocumentFragment();
-    // const func = new Function("html", "observe", `return ${text};`);
-    // observe(() => {
-    //   const elems = func.call(host, html, observe);
-    //   if (elems) render(frag, elems);
-    // });
-
-    // if (host.isolate) {
-    //   const defaultSlot = e.target
-    //     .getRootNode()
-    //     .querySelector("slot:not([name])");
-    //   defaultSlot.replaceChildren(frag);
-    //   // Mut remove all innerHTML content or the shadow DOM default will not show.
-    //   host.innerHTML = "";
-    // } else {
-    //   host.replaceChildren(frag);
-    // }
   },
   styles: `
     :host([isolate]) *, :host([isolate]) *::before, :host([isolate]) *::after {
