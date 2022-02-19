@@ -123,7 +123,7 @@ const MyElem = {
   connectedCallback() {
     console.log("connectedCallback: MyElem");
   },
-  async render() {
+  render() {
     return html`<div>
       My elem: ${this.$.name} :: ${this.$[fooableSym].test}
     </div>`;

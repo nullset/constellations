@@ -491,7 +491,7 @@ function define(tagName, mixins, options = {}) {
   });
 
   function buildProperty({ key, value, symbol }) {
-    console.log({ key, value, symbol });
+    // console.log({ key, value, symbol });
     if (typeof value === typeof Function) {
       if (lifecycleMethods.includes(key)) {
         const originalFn = BlissElement.prototype[key];
