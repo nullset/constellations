@@ -20,7 +20,7 @@
     <other-elem>Other</other-elem>
     <third-elem> Third </third-elem>
 
-    <e2-e>
+    <r2-1>
       <template slot="render">
         <p class="para" data-blah="bing">
           everything
@@ -36,23 +36,48 @@
       <script type="script" slot="script">
         console.log(this);
       </script>
-    </e2-e>
+    </r2-1>
 
-    <e-e isolate>
+    <r-1>
+      <script slot="script">
+        () => {
+          // Must be declared with `||=`, otherwise will be reset on each re-render.
+          this.$.messages ||= [];
+
+          const generateMessage = () => {
+            const time = Date.now();
+            this.$.messages.push({
+              time,
+              text: `A message at ${time}`,
+            });
+          };
+          return html`
+            <div style="display: flex; gap: 1em;">
+              <aside style="flex: 1 1;">
+                <button @click=${generateMessage}>Create message</button>
+              </aside>
+              <main style="flex: 2 1;">
+                <b>Messages length: ${this.$.messages.length}</b>
+
+                <ol>
+                  ${this.$.messages.map((m) => {
+                    return html`<li>${m.time} : ${m.text}</li>`;
+                  })}
+                </ol>
+              </main>
+            </div>
+          `;
+        };
+      </script>
+    </r-1>
+
+    <r-1 isolate>
       <script slot="script">
         () =>
           html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
         // alert(1);
       </script>
-    </e-e>
-
-    <e-e>
-      <script slot="script">
-        () =>
-          html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
-        // alert(1);
-      </script>
-    </e-e>
+    </r-1>
 
     <bliss-tabs>
       <bliss-tab>One</bliss-tab>

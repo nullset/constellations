@@ -110,27 +110,29 @@ import { html, define, observe, observable, raw, render } from "./src/index";
 // // });
 // define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
-// import { self as fooableSym, fooable } from "./src/mixins/fooable";
-// window.fb = fooableSym;
+import { self as fooableSym, fooable } from "./src/mixins/fooable";
+window.fb = fooableSym;
 
-// const MyElem = {
-//   props: {
-//     name: { type: String, default: "MySuperElem" },
-//   },
-//   constructorCallback() {
-//     console.log("constructorCallback: MyElem");
-//   },
-//   connectedCallback() {
-//     console.log("connectedCallback: MyElem");
-//   },
-//   render() {
-//     return html`<div>My elem: ${this.$[fooableSym].test}</div>`;
-//   },
-//   onclick() {
-//     this.$[fooableSym].test = this.$[fooableSym].test + 1;
-//   },
-// };
-// define("my-elem", [fooable(), MyElem]);
+const MyElem = {
+  props: {
+    name: { type: String, default: "MySuperElem" },
+  },
+  constructorCallback() {
+    console.log("constructorCallback: MyElem");
+  },
+  connectedCallback() {
+    console.log("connectedCallback: MyElem");
+  },
+  render() {
+    return html`<div>
+      My elem: ${this.$.name} :: ${this.$[fooableSym].test}
+    </div>`;
+  },
+  onclick() {
+    this.$[fooableSym].test = this.$[fooableSym].test + 1;
+  },
+};
+define("my-elem", [fooable(), MyElem]);
 
 // const myElemSym = Symbol("MyElem");
 // const OtherElem = {
@@ -162,17 +164,15 @@ import { html, define, observe, observable, raw, render } from "./src/index";
 // define("third-elem", [OtherElem, ThirdElem]);
 
 const cacheSym = Symbol("cacheSym");
-const EverythingElem = {
-  shadowClosed: true,
+const RenderElem = {
+  // shadowClosed: true,  // FIXME: if we set to true, then $ reactions don't seem to work.
   props: {
     slot: { type: String, default: undefined },
     isolate: { type: Boolean, default: false },
     bar: { type: Number, default: 33 },
   },
-  constructorCallback() {
-    this[cacheSym] = undefined;
-  },
   connectedCallback() {
+    this[cacheSym] = undefined;
     this.$.monkey = "Ceasar";
   },
   handleSlotChange(e) {
@@ -195,14 +195,13 @@ const EverythingElem = {
 
     const host = e.target.getRootNode().host;
     const frag = new DocumentFragment();
-    const func = new Function("html", `return ${text};`);
+    const func = new Function("html", "observe", `return ${text};`);
     observe(() => {
-      const elems = func.call(host, html);
+      const elems = func.call(host, html, observe);
       if (elems) render(frag, elems);
     });
 
     if (host.isolate) {
-      debugger;
       const defaultSlot = e.target
         .getRootNode()
         .querySelector("slot:not([name])");
@@ -226,4 +225,4 @@ const EverythingElem = {
     `;
   },
 };
-define("e-e", [EverythingElem]);
+define("r-1", [RenderElem]);
