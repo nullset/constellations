@@ -71,6 +71,23 @@
       </script>
     </r-1>
 
+    <blockquote>
+      <r-2 id="xx">
+        <script slot="script">
+          document.currentScript.$ = {
+            connectedCallback() {
+              setInterval(() => {
+                this.$.bar++;
+              }, 1000);
+            },
+            render(html) {
+              return html`<p>${this.$.bar}</p>`;
+            },
+          };
+        </script>
+      </r-2>
+    </blockquote>
+
     <r-1 isolate>
       <script slot="script">
         () =>

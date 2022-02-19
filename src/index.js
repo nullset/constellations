@@ -100,11 +100,12 @@ const lifecycleMethods = [
   "connectedCallback",
   "disconnectedCallback",
   "adoptedCallback",
-  "initialRenderCallback",
 
   // ----------------------------------------------------------------
-  "componentWillLoad",
-  "componentDidLoad",
+  "componentWillRender",
+  // TODO: Need a `componentWillRenderOnce` callback.
+  "componentDidRender",
+  "componentDidRenderOnce",
 ];
 
 // const globalContext = new Set();
@@ -121,6 +122,8 @@ function mixin(name, logic) {
 // {symbol, logic, lifecycleMethods }
 // When building prototypeChain
 // { [symbol]: logic }
+
+const instanceLifecycles = new WeakMap();
 
 function define(tagName, mixins, options = {}) {
   const { baseClass = HTMLElement, extend = undefined } = options;
@@ -270,6 +273,17 @@ function define(tagName, mixins, options = {}) {
       document.dispatchEvent(event);
     }
 
+    triggerInstanceLifecycle(lifecycleEvent) {
+      if (instanceLifecycles.has(this)) {
+        const instanceFn = instanceLifecycles.get(this)[lifecycleEvent];
+        if (instanceFn) instanceFn.call(this);
+      }
+    }
+
+    setInstanceLifecycles(obj) {
+      instanceLifecycles.set(this, obj);
+    }
+
     connectedCallback() {
       if (super.connectedCallback) super.connectedCallback();
 
@@ -285,6 +299,8 @@ function define(tagName, mixins, options = {}) {
 
       // Convert all props to reflected attributes.
       this.convertPropsToAttributes();
+
+      this.triggerInstanceLifecycle("connectedCallback");
 
       this.fireEvent("connectedCallback");
       this.renderToRoot();
@@ -402,11 +418,11 @@ function define(tagName, mixins, options = {}) {
 
       observe(async () => {
         if (!this[componentHasLoaded]) {
-          // `componentWillLoad` can return a promise, which will then delay rendering until resolved.
-          // `componentWillLoad` can return either a bare promise, or an object with { promise, placeholder?, error?: {message?, callback?} } defined.
+          // `componentWillRender` can return a promise, which will then delay rendering until resolved.
+          // `componentWillRender` can return either a bare promise, or an object with { promise, placeholder?, error?: {message?, callback?} } defined.
           // Placeholder will be shown until such time as promise resolves. Error will be shown if the promize ever rejects.
-          if (this.componentWillLoad) {
-            const willLoad = this.componentWillLoad();
+          if (this.componentWillRender) {
+            const willLoad = this.componentWillRender();
             const promise = willLoad.promise || willLoad;
             const placeholder = willLoad.placeholder;
             const { message: errorMessage, callback: errorCallback } =
@@ -416,7 +432,7 @@ function define(tagName, mixins, options = {}) {
             }
             try {
               await promise;
-              this.fireEvent("componentWillLoad");
+              this.fireEvent("componentWillRender");
             } catch (e) {
               if (errorMessage) render(rootNode, errorMessage);
               if (errorCallback) errorCallback.call(this);
@@ -429,10 +445,10 @@ function define(tagName, mixins, options = {}) {
 
         if (!this[componentHasLoaded]) {
           queueMicrotask(() => {
-            if (this.componentDidLoad) this.componentDidLoad();
+            if (this.componentDidRender) this.componentDidRender();
             this[componentHasLoaded] = true;
-            this.fireEvent("componentDidLoad");
-            if (this.initialRenderCallback) this.initialRenderCallback();
+            if (this.componentDidRenderOnce) this.componentDidRenderOnce();
+            this.fireEvent("componentDidRender");
           });
         }
       });
