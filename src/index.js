@@ -103,9 +103,7 @@ const lifecycleMethods = [
 
   // ----------------------------------------------------------------
   "componentWillRender",
-  // TODO: Need a `componentWillRenderOnce` callback.
   "componentDidRender",
-  "componentDidRenderOnce",
 ];
 
 // const globalContext = new Set();
@@ -447,7 +445,6 @@ function define(tagName, mixins, options = {}) {
           queueMicrotask(() => {
             if (this.componentDidRender) this.componentDidRender();
             this[componentHasLoaded] = true;
-            if (this.componentDidRenderOnce) this.componentDidRenderOnce();
             this.fireEvent("componentDidRender");
           });
         }

@@ -75,13 +75,35 @@
       <r-2 id="xx">
         <script slot="script">
           document.currentScript.$ = {
+            componentWillRender() {
+              this.$.arr = [];
+              // setInterval(() => {
+              //   this.$.arr.push(Date.now());
+              // }, 1000);
+              console.log("render - will render callback");
+            },
+            componentWillRenderOnce() {
+              console.log("render - will render once callback");
+            },
+            componentDidRender() {
+              console.log("render - did render callback");
+            },
+            componentDidRenderOnce() {
+              console.log("render - did render once callback");
+            },
             connectedCallback() {
-              //   setInterval(() => {
-              //     this.$.bar++;
-              //   }, 1000);
+              console.log("render - connected callback");
             },
             render(html) {
-              return html`<p>${this.$.bar}</p>`;
+              console.log("render");
+              return html`
+                <p>${this.$.monkey}</p>
+                <ol>
+                  ${this.$.arr.map((num, i) => {
+                    return html`<li>${i} : ${num}</li>`;
+                  })}
+                </ol>
+              `;
             },
           };
         </script>

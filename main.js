@@ -259,10 +259,8 @@ const R2 = {
         "constructorCallback",
         "connectedCallback",
         "componentWillRender",
-        "componentWillRenderOnce",
         "render",
         "componentDidRender",
-        "componentDidRenderOnce",
       ].forEach((lifecyleMethod) => {
         if (instanceProto[lifecyleMethod]) {
           if (lifecyleMethod === "render") {
