@@ -5,7 +5,10 @@ specifiers:
   '@ungap/custom-elements': ^1.0.0
   construct-style-sheets-polyfill: ^3.0.5
   deepmerge: ^4.2.2
+  prop-types: ^15.8.1
   proxy-pants: ^0.4.3
+  react: 16.8.4
+  react-dom: 16.8.4
   uhtml: ^2.8.0
   vite: ^2.7.2
   weak-value: ^0.2.3
@@ -15,7 +18,10 @@ dependencies:
   '@ungap/custom-elements': 1.0.0
   construct-style-sheets-polyfill: 3.0.5
   deepmerge: 4.2.2
+  prop-types: 15.8.1
   proxy-pants: 0.4.3
+  react: 16.8.4
+  react-dom: 16.8.4_react@16.8.4
   uhtml: 2.8.0
   weak-value: 0.2.3
 
@@ -236,8 +242,19 @@ packages:
       has: 1.0.3
     dev: true
 
+  /js-tokens/4.0.0:
+    resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+    dev: false
+
   /jsx2tag/0.3.0:
     resolution: {integrity: sha512-AcELEC4kZIByPXqtK+QdaQ0t7MVZkZ9zjoitLwqGkpLkopDwBOwpG0JHxBcqGaVkv2KF3jPFp6l3l/5cN3J/Yw==}
+    dev: false
+
+  /loose-envify/1.4.0:
+    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
+    dependencies:
+      js-tokens: 4.0.0
     dev: false
 
   /nanoid/3.1.32:
@@ -245,6 +262,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /object-assign/4.1.1:
+    resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=}
+    engines: {node: '>=0.10.0'}
+    dev: false
 
   /path-parse/1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
@@ -263,8 +285,42 @@ packages:
       source-map-js: 1.0.1
     dev: true
 
+  /prop-types/15.8.1:
+    resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      react-is: 16.13.1
+    dev: false
+
   /proxy-pants/0.4.3:
     resolution: {integrity: sha512-aAh1O2MeviQQGluu5pfxeEUv4mWaOqf/FWQzitjA7kYVHAlgt8eqc5SlJ7tugIXafwb2wxSzAGcoqquqGJOlvw==}
+    dev: false
+
+  /react-dom/16.8.4_react@16.8.4:
+    resolution: {integrity: sha512-Ob2wK7XG2tUDt7ps7LtLzGYYB6DXMCLj0G5fO6WeEICtT4/HdpOi7W/xLzZnR6RCG1tYza60nMdqtxzA8FaPJQ==}
+    peerDependencies:
+      react: ^16.0.0
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      prop-types: 15.8.1
+      react: 16.8.4
+      scheduler: 0.13.6
+    dev: false
+
+  /react-is/16.13.1:
+    resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+    dev: false
+
+  /react/16.8.4:
+    resolution: {integrity: sha512-0GQ6gFXfUH7aZcjGVymlPOASTuSjlQL4ZtVC5YKH+3JL6bBLCVO21DknzmaPlI90LN253ojj02nsapy+j7wIjg==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      prop-types: 15.8.1
+      scheduler: 0.13.6
     dev: false
 
   /resolve/1.21.0:
@@ -283,6 +339,13 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
+
+  /scheduler/0.13.6:
+    resolution: {integrity: sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ==}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+    dev: false
 
   /source-map-js/1.0.1:
     resolution: {integrity: sha512-4+TN2b3tqOCd/kaGRJ/sTYA0tR0mdXx26ipdolxcwtJVqEnqNYvlCAt1q3ypy4QMlYus+Zh34RNtYLoq2oQ4IA==}

@@ -179,8 +179,6 @@ function define(tagName, mixins, options = {}) {
   class BlissElement extends baseClass {
     $ = observable(Object.create(null));
 
-    foo = 4;
-
     [isBlissElement] = true;
 
     static get observedAttributes() {
