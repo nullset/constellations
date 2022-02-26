@@ -25,7 +25,11 @@ const MyElem = {
     const handleChange = (event) => setGreeting(event.target.value);
     return (
       <div>
-        <slot></slot> = My elem: {this.$.name}{" "}
+        <h2>My Elem</h2>
+        <h3>light DOM</h3>
+        <slot></slot>
+        <h3>shadow DOM</h3>
+        <p>My elem: {this.$.name}</p>
         <button onClick={handleClick}>change</button>
       </div>
     );
