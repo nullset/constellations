@@ -1,6 +1,10 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { store, view } from "@risingstack/react-easy-state";
+import deepmerge from "deepmerge";
+
 import { observable, observe, raw } from "@nx-js/observer-util";
 import { render, html, svg } from "uhtml";
-import deepmerge from "deepmerge";
 
 // Polyfills
 import "construct-style-sheets-polyfill"; // Non-Chromium
@@ -176,8 +180,9 @@ function define(tagName, mixins, options = {}) {
 
   const createConstellationSym = Symbol("createConstellation");
   const supernovaSym = Symbol("supernova");
+
   class BlissElement extends baseClass {
-    $ = observable(Object.create(null));
+    $ = store(Object.create(null));
 
     [isBlissElement] = true;
 
@@ -378,7 +383,7 @@ function define(tagName, mixins, options = {}) {
         const attributeName = value.attribute || pascalCaseToSnakeCase(prop);
 
         // Observe update state keys, and set attributes appropriately.
-        observe(() => {
+        view(() => {
           let convertedValue =
             this.$[prop] == null
               ? null
@@ -404,49 +409,69 @@ function define(tagName, mixins, options = {}) {
       });
     }
 
-    renderToRoot() {
-      if (this.shadow === false || !this.render) return;
+    // renderToRoot2() {
+    //   if (this.shadow === false || !this.render) return;
 
+    //   let rootNode =
+    //     this.shadowRoot ||
+    //     this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
+    //   rootNode.adoptedStyleSheets = componentStylesheets;
+
+    //   observe(async () => {
+    //     if (!this[componentHasLoaded]) {
+    //       // `componentWillRender` can return a promise, which will then delay rendering until resolved.
+    //       // `componentWillRender` can return either a bare promise, or an object with { promise, placeholder?, error?: {message?, callback?} } defined.
+    //       // Placeholder will be shown until such time as promise resolves. Error will be shown if the promize ever rejects.
+    //       if (this.componentWillRender) {
+    //         const willLoad = this.componentWillRender();
+    //         const promise = willLoad.promise || willLoad;
+    //         const placeholder = willLoad.placeholder;
+    //         const { message: errorMessage, callback: errorCallback } =
+    //           willLoad.error;
+    //         if (placeholder) {
+    //           render(rootNode, placeholder);
+    //         }
+    //         try {
+    //           await promise;
+    //           this.fireEvent("componentWillRender");
+    //         } catch (e) {
+    //           if (errorMessage) render(rootNode, errorMessage);
+    //           if (errorCallback) errorCallback.call(this);
+    //           return;
+    //         }
+    //       }
+    //     }
+
+    //     render(rootNode, await this.render());
+
+    //     if (!this[componentHasLoaded]) {
+    //       queueMicrotask(() => {
+    //         if (this.componentDidRender) this.componentDidRender();
+    //         this[componentHasLoaded] = true;
+    //         this.fireEvent("componentDidRender");
+    //       });
+    //     }
+    //   });
+    // }
+
+    renderToRoot() {
       let rootNode =
         this.shadowRoot ||
         this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
-      rootNode.adoptedStyleSheets = componentStylesheets;
 
-      observe(async () => {
-        if (!this[componentHasLoaded]) {
-          // `componentWillRender` can return a promise, which will then delay rendering until resolved.
-          // `componentWillRender` can return either a bare promise, or an object with { promise, placeholder?, error?: {message?, callback?} } defined.
-          // Placeholder will be shown until such time as promise resolves. Error will be shown if the promize ever rejects.
-          if (this.componentWillRender) {
-            const willLoad = this.componentWillRender();
-            const promise = willLoad.promise || willLoad;
-            const placeholder = willLoad.placeholder;
-            const { message: errorMessage, callback: errorCallback } =
-              willLoad.error;
-            if (placeholder) {
-              render(rootNode, placeholder);
-            }
-            try {
-              await promise;
-              this.fireEvent("componentWillRender");
-            } catch (e) {
-              if (errorMessage) render(rootNode, errorMessage);
-              if (errorCallback) errorCallback.call(this);
-              return;
-            }
-          }
-        }
-
-        render(rootNode, await this.render());
-
-        if (!this[componentHasLoaded]) {
-          queueMicrotask(() => {
-            if (this.componentDidRender) this.componentDidRender();
-            this[componentHasLoaded] = true;
-            this.fireEvent("componentDidRender");
-          });
-        }
+      const foo = observe(() => {
+        console.log("foo is redone");
+        return this.render();
       });
+
+      observe(() => {
+        ReactDOM.render(
+          <React.StrictMode>{this.render()}</React.StrictMode>,
+          rootNode
+        );
+      });
+
+      // ReactDOM.render(<React.StrictMode>{foo()}</React.StrictMode>, rootNode);
     }
 
     // Bliss elements are just "bags of state" that happen to render something on the screen.
@@ -540,7 +565,8 @@ function define(tagName, mixins, options = {}) {
   customElements.define(tagName, BlissElement, { extends: extend });
 }
 
-export { define, html, svg, observable, observe, raw, render };
+// export { define, html, svg, observable, observe, raw, render };
+export { define, store, view };
 
 // TODO: Need to ensure that:
 // 1) Mixin methods can be overriden

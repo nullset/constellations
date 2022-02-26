@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="/main.jsx"></script>
     <style>
       html {
         background: lightslategray;
@@ -16,153 +16,9 @@
     </style>
   </head>
   <body>
-    <my-elem>MY ELEM</my-elem>
-    <other-elem>Other</other-elem>
-    <third-elem> Third </third-elem>
-
-    <r2-1>
-      <template slot="render">
-        <p class="para" data-blah="bing">
-          everything
-          <b>
-            apple
-            <!-- <x>alert()</x> -->
-            <!-- <x>observe(() => this.$.monkey)</x> -->
-            <x>this.$.monkey</x>
-            cat
-          </b>
-        </p>
-      </template>
-      <script type="script" slot="script">
-        console.log(this);
-      </script>
-    </r2-1>
-
-    <r-1>
-      <script slot="script">
-        () => {
-          // Must be declared with `||=`, otherwise will be reset on each re-render.
-          this.$.messages ||= [];
-
-          const generateMessage = () => {
-            const time = Date.now();
-            this.$.messages.push({
-              time,
-              text: `A message at ${time}`,
-            });
-          };
-          return html`
-            <div style="display: flex; gap: 1em;">
-              <aside style="flex: 1 1;">
-                <button @click=${generateMessage}>Create message</button>
-              </aside>
-              <main style="flex: 2 1;">
-                <b>Messages length: ${this.$.messages.length}</b>
-
-                <ol>
-                  ${this.$.messages.map((m) => {
-                    return html`<li>${m.time} : ${m.text}</li>`;
-                  })}
-                </ol>
-              </main>
-            </div>
-          `;
-        };
-      </script>
-    </r-1>
-
-    <blockquote>
-      <r-2 id="xx">
-        <script slot="script">
-          document.currentScript.$ = {
-            componentWillRender() {
-              this.$.arr = [];
-              // setInterval(() => {
-              //   this.$.arr.push(Date.now());
-              // }, 1000);
-              console.log("render - will render callback");
-            },
-            componentWillRenderOnce() {
-              console.log("render - will render once callback");
-            },
-            componentDidRender() {
-              console.log("render - did render callback");
-            },
-            componentDidRenderOnce() {
-              console.log("render - did render once callback");
-            },
-            connectedCallback() {
-              console.log("render - connected callback");
-            },
-            render(html) {
-              console.log("render");
-              return html`
-                <p>${this.$.monkey}</p>
-                <ol>
-                  ${this.$.arr.map((num, i) => {
-                    return html`<li>${i} : ${num}</li>`;
-                  })}
-                </ol>
-              `;
-            },
-          };
-        </script>
-      </r-2>
-    </blockquote>
-
-    <r-1 isolate>
-      <script slot="script">
-        () =>
-          html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
-        // alert(1);
-      </script>
-    </r-1>
-
-    <bliss-tabs>
-      <bliss-tab>One</bliss-tab>
-      <bliss-tab-content>
-        <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-          sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-          dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-          et justo duo dolores et ea rebum.
-        </p>
-      </bliss-tab-content>
-
-      <bliss-tab active>Two</bliss-tab>
-      <bliss-tab-content>
-        <p>
-          Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-          dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
-          elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
-          magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-          justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea
-          takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-      </bliss-tab-content>
-
-      <bliss-tab disabled>Three</bliss-tab>
-      <bliss-tab-content>
-        <p>More stuff for third tab</p>
-      </bliss-tab-content>
-
-      <bliss-tab>Four</bliss-tab>
-      <bliss-tab-content>
-        <p>This section has sub-tabs!</p>
-
-        <bliss-tabs slot>
-          <bliss-tab>Four.One</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.1</p></bliss-tab-content>
-          <bliss-tab>Four.Two</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.2</p></bliss-tab-content>
-          <bliss-tab>Four.Three</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.3</p></bliss-tab-content>
-        </bliss-tabs>
-      </bliss-tab-content>
-    </bliss-tabs>
+    <my-elem>
+      MY ELEM
+      <div class="monkey">monkey</div>
+    </my-elem>
   </body>
 </html>

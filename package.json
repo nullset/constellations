@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nx-js/observer-util": "^4.2.2",
+    "@risingstack/react-easy-state": "^6.3.0",
     "@ungap/custom-elements": "^1.0.0",
     "construct-style-sheets-polyfill": "^3.0.5",
     "deepmerge": "^4.2.2",

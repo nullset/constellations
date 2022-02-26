@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@nx-js/observer-util': ^4.2.2
+  '@risingstack/react-easy-state': ^6.3.0
   '@ungap/custom-elements': ^1.0.0
   construct-style-sheets-polyfill: ^3.0.5
   deepmerge: ^4.2.2
@@ -15,6 +16,7 @@ specifiers:
 
 dependencies:
   '@nx-js/observer-util': 4.2.2
+  '@risingstack/react-easy-state': 6.3.0_react@16.8.4
   '@ungap/custom-elements': 1.0.0
   construct-style-sheets-polyfill: 3.0.5
   deepmerge: 4.2.2
@@ -33,6 +35,16 @@ packages:
   /@nx-js/observer-util/4.2.2:
     resolution: {integrity: sha512-9OayX1xkdGjdnsDiO2YdaYJ6aMyCF7/NY4QWVgIgjSAZJ4OX2fD766Ts79hEzBscenQy2DCaSoY8VkguIMB1ZA==}
     engines: {node: '>=6.5.0'}
+    dev: false
+
+  /@risingstack/react-easy-state/6.3.0_react@16.8.4:
+    resolution: {integrity: sha512-AGLrzvwloZL7dgagwRkxJaq7bcDsOGdHrCpHZIlMIxcFLdFr5IpD2/kcmTlC34H682pvfIl1lzNxBw72la10aA==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      '@nx-js/observer-util': 4.2.2
+      react: 16.8.4
     dev: false
 
   /@ungap/create-content/0.3.1:
