@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { store, view } from "@risingstack/react-easy-state";
+import retargetEvents from "react-shadow-dom-retarget-events";
 import deepmerge from "deepmerge";
 
 import { observable, observe, raw } from "@nx-js/observer-util";
@@ -92,7 +93,7 @@ function constructStylesheets(prototypes) {
     .flat(Infinity);
 }
 
-const eventRegex = new RegExp("^on([a-z])", "i");
+const eventRegex = new RegExp("^on([a-z])");
 function isAnEvent(name) {
   return eventRegex.test(name);
 }
@@ -459,6 +460,9 @@ function define(tagName, mixins, options = {}) {
         this.shadowRoot ||
         this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
 
+      // NOTE: This seems to make events fire twice all the time. Not exactly
+      // retargetEvents(this.shadowRoot);
+
       observe(() => {
         ReactDOM.render(
           <React.StrictMode>
@@ -515,23 +519,21 @@ function define(tagName, mixins, options = {}) {
           value.call(this, args);
         };
       } else if (isAnEvent(key)) {
-        // If a mixin has an event defined on it, simply ignore it. The event will need to be moved
-        // outside of the symbol namespaced area, or, alternately, simply named something else and then
-        // called within the `on[event]` method outside the symbol namespaced area.
-        if (symbol) {
-          console.warn(
-            `Mixin ${symbol.toString()} has event "${key}" defined within its namespace. Events can only be defined outside of namespaced sections. Please move the event to the non-namespaced section of the mixin.`
-          );
-          return;
-        }
-
-        // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
-
-        Object.defineProperty(BlissElement.prototype, key, {
-          value: value,
-          enumerable: true,
-          configurable: true,
-        });
+        // // If a mixin has an event defined on it, simply ignore it. The event will need to be moved
+        // // outside of the symbol namespaced area, or, alternately, simply named something else and then
+        // // called within the `on[event]` method outside the symbol namespaced area.
+        // if (symbol) {
+        //   console.warn(
+        //     `Mixin ${symbol.toString()} has event "${key}" defined within its namespace. Events can only be defined outside of namespaced sections. Please move the event to the non-namespaced section of the mixin.`
+        //   );
+        //   return;
+        // }
+        // // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
+        // Object.defineProperty(BlissElement.prototype, key, {
+        //   value: value,
+        //   enumerable: true,
+        //   configurable: true,
+        // });
       } else {
         BlissElement.prototype[key] = value;
       }

@@ -22,13 +22,15 @@ const App = view(({ counter }) => {
       <h1>
         {greeting} : {counter.num}
       </h1>
-      <my-elem
-        name={counter.num}
-        onclick={counter.increment}
-        style={{ background: "red", display: "block" }}
-      >
-        Some light dom stuff
-      </my-elem>
+      <div onClick={() => console.log("click parent div")}>
+        <my-elem
+          name={counter.num}
+          onClick={() => console.log("click on my-elem")}
+          style={{ background: "red", display: "block" }}
+        >
+          Some light dom stuff
+        </my-elem>
+      </div>
       <Foo />
       <hr />
     </div>

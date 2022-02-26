@@ -19,6 +19,7 @@
     "proxy-pants": "^0.4.3",
     "react": "16.8.4",
     "react-dom": "16.8.4",
+    "react-shadow-dom-retarget-events": "^1.1.0",
     "uhtml": "^2.8.0",
     "weak-value": "^0.2.3"
   }

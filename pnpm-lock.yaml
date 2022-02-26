@@ -10,6 +10,7 @@ specifiers:
   proxy-pants: ^0.4.3
   react: 16.8.4
   react-dom: 16.8.4
+  react-shadow-dom-retarget-events: ^1.1.0
   uhtml: ^2.8.0
   vite: ^2.7.2
   weak-value: ^0.2.3
@@ -24,6 +25,7 @@ dependencies:
   proxy-pants: 0.4.3
   react: 16.8.4
   react-dom: 16.8.4_react@16.8.4
+  react-shadow-dom-retarget-events: 1.1.0
   uhtml: 2.8.0
   weak-value: 0.2.3
 
@@ -323,6 +325,10 @@ packages:
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+    dev: false
+
+  /react-shadow-dom-retarget-events/1.1.0:
+    resolution: {integrity: sha512-hI/naZ8fUARf5He4PpvQtqhs/VWoocfg3ULeCOE3ccWiXGEsFpshlx2iB1XNtm2SFDdvZYoSo25a8JViYdAcgQ==}
     dev: false
 
   /react/16.8.4:
