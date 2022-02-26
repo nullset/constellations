@@ -459,19 +459,14 @@ function define(tagName, mixins, options = {}) {
         this.shadowRoot ||
         this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
 
-      const foo = observe(() => {
-        console.log("foo is redone");
-        return this.render();
-      });
-
       observe(() => {
         ReactDOM.render(
-          <React.StrictMode>{this.render()}</React.StrictMode>,
+          <React.StrictMode>
+            {this.render.call(this, { host: this })}
+          </React.StrictMode>,
           rootNode
         );
       });
-
-      // ReactDOM.render(<React.StrictMode>{foo()}</React.StrictMode>, rootNode);
     }
 
     // Bliss elements are just "bags of state" that happen to render something on the screen.

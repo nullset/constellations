@@ -11,11 +11,18 @@ const MyElem = {
   connectedCallback() {
     console.log("connectedCallback: MyElem");
   },
-  render() {
-    function handleClick(e) {
+  handleClick(e) {
+    console.log(this, e);
+    debugger;
+  },
+  render({ host }) {
+    console.log(host);
+    const handleClick = (e) => {
+      console.log(this, e);
       debugger;
       // this.$.name = "foo";
-    }
+    };
+    const handleChange = (event) => setGreeting(event.target.value);
     return (
       <div>
         <slot></slot> = My elem: {this.$.name}{" "}
