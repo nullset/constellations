@@ -43,6 +43,5 @@ const MyElem = {
       </div>
     );
   },
-  onclick() {},
 };
 define("my-elem", [MyElem]);
