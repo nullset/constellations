@@ -5,7 +5,6 @@ import { define, view, store } from "./src/index";
 const counter = store({
   num: 0,
   increment: () => {
-    debugger;
     counter.num++;
   },
 });
@@ -25,7 +24,7 @@ const App = view(({ counter }) => {
       <div onClick={() => console.log("click parent div")}>
         <my-elem
           name={counter.num}
-          onClick={() => console.log("click on my-elem")}
+          onClick={() => console.log("click on my-elem", this)}
           style={{ background: "red", display: "block" }}
         >
           Some light dom stuff

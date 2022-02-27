@@ -18,9 +18,6 @@ const MyElem = {
   // onclick() {
   //   console.log("click on <div>");
   // },
-  onclick() {
-    debugger;
-  },
   render({ host }) {
     console.log("---render ", host);
     const handleClick = (e) => {

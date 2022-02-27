@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { store, view } from "@risingstack/react-easy-state";
-import retargetEvents from "react-shadow-dom-retarget-events";
+// import retargetEvents from "react-shadow-dom-retarget-events";
 import deepmerge from "deepmerge";
 
 import { observable, observe, raw } from "@nx-js/observer-util";
@@ -93,7 +93,7 @@ function constructStylesheets(prototypes) {
     .flat(Infinity);
 }
 
-const eventRegex = new RegExp("^on([a-z])");
+const eventRegex = new RegExp("^on([a-z])", "i");
 function isAnEvent(name) {
   return eventRegex.test(name);
 }
