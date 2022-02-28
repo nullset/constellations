@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { store, view } from "@risingstack/react-easy-state";
 // import retargetEvents from "react-shadow-dom-retarget-events";
@@ -10,6 +10,24 @@ import { render, html, svg } from "uhtml";
 // Polyfills
 import "construct-style-sheets-polyfill"; // Non-Chromium
 import "@ungap/custom-elements"; // Safari
+
+const RenderFn = ({ host }) => {
+  useEffect(() => {
+    ReactDOM.createPortal(host, document.body);
+  });
+
+  return (
+    <div onClick={() => console.log("clicked on div")}>
+      <h2>My Elem</h2>
+      <h3>light DOM</h3>
+      <slot></slot>
+      <h3>shadow DOM</h3>
+      <p>My elem: {host.$.name}</p>
+      {/* <button onClick={handleClick}>change</button> */}
+      {/* {ReactDOM.createPortal(<h1>Liftedup</h1>, document.body)} */}
+    </div>
+  );
+};
 
 // const Stars = new WeakMap();
 // window.Stars = Stars;
@@ -466,7 +484,12 @@ function define(tagName, mixins, options = {}) {
       observe(() => {
         ReactDOM.render(
           <React.StrictMode>
-            {this.render.call(this, { host: this })}
+            {/* <RenderFn host={this} /> */}
+            {/* {React.createElement(RenderFn, { host: this }, null)} */}
+
+            {React.createElement(this.render, { host: this }, null)}
+            {/* {this.render.call(this, { host: this })} */}
+            {/* {RenderFn({ host: this })} */}
           </React.StrictMode>,
           rootNode
         );
