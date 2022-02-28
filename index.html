@@ -17,9 +17,19 @@
   </head>
   <body>
     <div id="app"></div>
-    <my-elem style="display: block; background: lime" onclick="console.trace()">
-      MY ELEM 2
-      <div class="monkey">monkey</div>
+    <my-elem
+      style="display: block; background: lime"
+      onclick="console.log('clicked on directly set onclick event')"
+    >
+      MY ELEM 2 in light dom
+      <div class="monkey">monkey in light dom</div>
+      <my-elem
+        style="display: block; background: blue"
+        onclick="console.log('clicked on directly set onclick event')"
+      >
+        XXXX MY ELEM 2 in light dom
+        <div class="monkey">monkey in light dom</div>
+      </my-elem>
     </my-elem>
 
     <script type="module" src="/app.jsx"></script>

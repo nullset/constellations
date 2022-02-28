@@ -1,3 +1,4 @@
+// TODO: name framework "chimera"
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { store, view } from "@risingstack/react-easy-state";
@@ -10,24 +11,6 @@ import { render, html, svg } from "uhtml";
 // Polyfills
 import "construct-style-sheets-polyfill"; // Non-Chromium
 import "@ungap/custom-elements"; // Safari
-
-const RenderFn = ({ host }) => {
-  useEffect(() => {
-    ReactDOM.createPortal(host, document.body);
-  });
-
-  return (
-    <div onClick={() => console.log("clicked on div")}>
-      <h2>My Elem</h2>
-      <h3>light DOM</h3>
-      <slot></slot>
-      <h3>shadow DOM</h3>
-      <p>My elem: {host.$.name}</p>
-      {/* <button onClick={handleClick}>change</button> */}
-      {/* {ReactDOM.createPortal(<h1>Liftedup</h1>, document.body)} */}
-    </div>
-  );
-};
 
 // const Stars = new WeakMap();
 // window.Stars = Stars;
@@ -309,13 +292,13 @@ function define(tagName, mixins, options = {}) {
 
       this[createConstellationSym]();
 
-      // Set implicit slot name.
-      this.slot =
-        this.getAttribute("is") ||
-        (this.hasAttribute("slot")
-          ? this.getAttribute("slot")
-          : this.tagName.toLowerCase()
-        ).replace(/^.*?-/, "");
+      // // Set implicit slot name.
+      // this.slot =
+      //   this.getAttribute("is") ||
+      //   (this.hasAttribute("slot")
+      //     ? this.getAttribute("slot")
+      //     : this.tagName.toLowerCase()
+      //   ).replace(/^.*?-/, "");
 
       // Convert all props to reflected attributes.
       this.convertPropsToAttributes();
@@ -484,12 +467,7 @@ function define(tagName, mixins, options = {}) {
       observe(() => {
         ReactDOM.render(
           <React.StrictMode>
-            {/* <RenderFn host={this} /> */}
-            {/* {React.createElement(RenderFn, { host: this }, null)} */}
-
-            {React.createElement(this.render, { host: this }, null)}
-            {/* {this.render.call(this, { host: this })} */}
-            {/* {RenderFn({ host: this })} */}
+            {React.createElement(this.render, { host: this }, this.children)}
           </React.StrictMode>,
           rootNode
         );
