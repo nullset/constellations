@@ -5,6 +5,7 @@ import { define, view } from "./src/index";
 const MyElem = {
   props: {
     name: { type: String, default: "MySuperElem" },
+    // counter: { type: Object },
   },
   // constructorCallback() {
   //   console.log("constructorCallback: MyElem");
@@ -21,7 +22,6 @@ const MyElem = {
   //   console.log("click on <my-elem>");
   // },
   render({ host }) {
-    console.trace("---render ", host);
     // debugger;
     const handleClick = (e) => {
       console.log(host, e);

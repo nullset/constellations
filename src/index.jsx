@@ -184,7 +184,7 @@ function define(tagName, mixins, options = {}) {
   const supernovaSym = Symbol("supernova");
 
   class BlissElement extends baseClass {
-    $ = store(Object.create(null));
+    $ = observable(Object.create(null));
 
     [isBlissElement] = true;
 
@@ -385,7 +385,7 @@ function define(tagName, mixins, options = {}) {
         const attributeName = value.attribute || pascalCaseToSnakeCase(prop);
 
         // Observe update state keys, and set attributes appropriately.
-        view(() => {
+        observe(() => {
           let convertedValue =
             this.$[prop] == null
               ? null
@@ -567,7 +567,7 @@ function define(tagName, mixins, options = {}) {
 }
 
 // export { define, html, svg, observable, observe, raw, render };
-export { define, store, view };
+export { define, store, view, observable, observe };
 
 // TODO: Need to ensure that:
 // 1) Mixin methods can be overriden
