@@ -140,8 +140,8 @@ function define(tagName, mixins, options = {}) {
   let prototypeChain = new Set([
     {
       props: {
-        hidden: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
+        hidden: { type: Boolean, value: false },
+        disabled: { type: Boolean, value: false },
       },
     },
     ...mixins.map((mixin) => {
@@ -184,7 +184,7 @@ function define(tagName, mixins, options = {}) {
   const supernovaSym = Symbol("supernova");
 
   class BlissElement extends baseClass {
-    $ = observable(Object.create(null));
+    $ = store(Object.create(null));
 
     [isBlissElement] = true;
 
@@ -371,18 +371,18 @@ function define(tagName, mixins, options = {}) {
     // Convert properties to strings and set on attributes.
     // Based on `$` (state) so values are reactive.
     convertPropsToAttributes() {
-      Object.entries(flattenedPrototype.props).forEach(([prop, value]) => {
-        const converter = value.type || String;
+      Object.entries(flattenedPrototype.props).forEach(([prop, obj]) => {
+        const converter = obj.type || String;
         if (converter === Function) return;
 
         // Set initial prop values based on default value of prop.
         if (typeof this[prop] === "undefined") {
-          this[prop] = this.typecastValue(converter, value.default);
+          this[prop] = this.typecastValue(converter, obj.value);
         }
 
-        if (value.reflect === false) return;
+        if (obj.reflect === false) return;
 
-        const attributeName = value.attribute || pascalCaseToSnakeCase(prop);
+        const attributeName = obj.attribute || pascalCaseToSnakeCase(prop);
 
         // Observe update state keys, and set attributes appropriately.
         observe(() => {
@@ -406,7 +406,7 @@ function define(tagName, mixins, options = {}) {
         // Set inintial default values.
         this.$[prop] =
           typeof this[prop] === "undefined"
-            ? flattenedPrototype.props[prop].default
+            ? flattenedPrototype.props[prop].value
             : this[prop];
       });
     }
@@ -465,14 +465,14 @@ function define(tagName, mixins, options = {}) {
       main.id = "react-mount";
       rootNode.append(main);
 
-      // observe(() => {
-      ReactDOM.render(
-        <React.StrictMode>
-          {React.createElement(this.render, { host: this }, this.children)}
-        </React.StrictMode>,
-        main
-      );
-      // });
+      observe(() => {
+        ReactDOM.render(
+          <React.StrictMode>
+            {React.createElement(this.render, { host: this }, this.children)}
+          </React.StrictMode>,
+          main
+        );
+      });
 
       rootNode.append(main);
     }
