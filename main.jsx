@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import { define, view } from "./src/index";
+import { define, view, observe } from "./src/index";
 
 const MyElem = {
   props: {
-    name: { type: String, default: "MySuperElem" },
+    foo: { type: String, value: "MySuperElem" },
     // counter: { type: Object },
   },
   // constructorCallback() {
@@ -59,3 +59,16 @@ const MyElem = {
   },
 };
 define("my-elem", [MyElem]);
+
+const Portal = {
+  props: {
+    active: { type: Boolean, value: false },
+  },
+  render({ host }) {
+    const projectedElem = <slot></slot>;
+    return host.active
+      ? ReactDOM.createPortal(projectedElem, document.body)
+      : projectedElem;
+  },
+};
+define("aha-portal", [Portal]);
