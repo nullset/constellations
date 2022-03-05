@@ -22,7 +22,7 @@ const MyElem = {
   // },
   render({ host }) {
     console.trace("---render ", host);
-    debugger;
+    // debugger;
     const handleClick = (e) => {
       console.log(host, e);
       // debugger;

@@ -27,6 +27,7 @@ const App = view(({ counter }) => {
           onClick={() => console.log("click on my-elem", this)}
           style={{ background: "red", display: "block" }}
         >
+          <Foo />
           Some light dom stuff
         </my-elem>
       </div>

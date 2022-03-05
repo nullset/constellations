@@ -461,17 +461,20 @@ function define(tagName, mixins, options = {}) {
         this.shadowRoot ||
         this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
 
-      // NOTE: This seems to make events fire twice all the time. Not exactly
-      // retargetEvents(this.shadowRoot);
+      const main = document.createElement("main");
+      main.id = "react-mount";
+      rootNode.append(main);
 
-      observe(() => {
-        ReactDOM.render(
-          <React.StrictMode>
-            {React.createElement(this.render, { host: this }, this.children)}
-          </React.StrictMode>,
-          rootNode
-        );
-      });
+      // observe(() => {
+      ReactDOM.render(
+        <React.StrictMode>
+          {React.createElement(this.render, { host: this }, this.children)}
+        </React.StrictMode>,
+        main
+      );
+      // });
+
+      rootNode.append(main);
     }
 
     // Bliss elements are just "bags of state" that happen to render something on the screen.
