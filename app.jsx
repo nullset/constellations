@@ -38,7 +38,7 @@ const App = view(({ counter }) => {
     });
   }, []);
 
-  // An object of different keys/values that are applied to the reactive state of a web component.
+  // An object of different stores and they names "keys"that are used to appy to the reactive state of a web component.
   // When the value is updated within the web component it also updates within the react component,
   // and vice-versa.
   const useWebComponentStores = (entries) => {
@@ -50,21 +50,6 @@ const App = view(({ counter }) => {
             Reflect.set(target, propKey, value);
           },
         });
-      });
-      // node.$[key] = new Proxy(key, {
-      //   set(target, propKey, value) {
-      //     Reflect.set(target, propKey, value);
-      //   },
-      // });
-    }, []);
-  };
-
-  const useWebComponentStore = (key, store) => {
-    return useCallback((node) => {
-      node.$[key] = new Proxy(store, {
-        set(target, propKey, value) {
-          Reflect.set(target, propKey, value);
-        },
       });
     }, []);
   };
