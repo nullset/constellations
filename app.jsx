@@ -38,14 +38,36 @@ const App = view(({ counter }) => {
     });
   }, []);
 
-  const useStores = (key) =>
-    useCallback((node) => {
-      node.$[key] = new Proxy(key, {
+  // An object of different keys/values that are applied to the reactive state of a web component.
+  // When the value is updated within the web component it also updates within the react component,
+  // and vice-versa.
+  const useWebComponentStores = (entries) => {
+    console.log({ entries });
+    return useCallback((node) => {
+      Object.entries(entries).map(([key, store]) => {
+        node.$[key] = new Proxy(store, {
+          set(target, propKey, value) {
+            Reflect.set(target, propKey, value);
+          },
+        });
+      });
+      // node.$[key] = new Proxy(key, {
+      //   set(target, propKey, value) {
+      //     Reflect.set(target, propKey, value);
+      //   },
+      // });
+    }, []);
+  };
+
+  const useWebComponentStore = (key, store) => {
+    return useCallback((node) => {
+      node.$[key] = new Proxy(store, {
         set(target, propKey, value) {
           Reflect.set(target, propKey, value);
         },
       });
     }, []);
+  };
 
   return (
     <div>
@@ -54,7 +76,9 @@ const App = view(({ counter }) => {
       </h1>
       <div onClick={() => console.log("click parent div")}>
         <my-elem
-          ref={blah}
+          // ref={blah}
+          ref={useWebComponentStores({ counter })}
+          // ref={useStore("counter", counter)}
           name={counter.num}
           onClick={() => console.log("click on my-elem", this)}
           style={{ background: "red", display: "block" }}
