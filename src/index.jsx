@@ -184,7 +184,7 @@ function define(tagName, mixins, options = {}) {
   const supernovaSym = Symbol("supernova");
 
   class BlissElement extends baseClass {
-    $ = store(Object.create(null));
+    $ = observable(Object.create(null));
 
     [isBlissElement] = true;
 
@@ -468,7 +468,15 @@ function define(tagName, mixins, options = {}) {
       observe(() => {
         ReactDOM.render(
           <React.StrictMode>
-            {React.createElement(this.render, { host: this }, this.children)}
+            {React.createElement(
+              this.render,
+              {
+                host: this,
+                // Force the component to re-render any time a `$` value changes.
+                ...this.$,
+              },
+              this.children
+            )}
           </React.StrictMode>,
           main
         );

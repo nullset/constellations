@@ -43,19 +43,23 @@ const MyElem = {
       ReactDOM.createPortal(host, document.body);
     });
 
-    return (
-      <div onClick={() => console.log("clicked on div")}>
-        <h2>My Elem</h2>
-        <h3>light DOM</h3>
-        <slot></slot>
-        <h3>shadow DOM</h3>
-        <p>My elem: {host.$.name}</p>
-        <button onClick={handleClick}>change</button>
-        <h3>Children</h3>
-        {host.chilren}
-        {/* {ReactDOM.createPortal(<h1>Liftedup</h1>, document.body)} */}
-      </div>
-    );
+    if (host.$.foo === 0) {
+      return <div>I am zero</div>;
+    } else {
+      return (
+        <div onClick={() => console.log("clicked on div")}>
+          <h2>My Elem</h2>
+          <h3>light DOM</h3>
+          <slot></slot>
+          <h3>shadow DOM</h3>
+          <p>My elem: {host.$.name}</p>
+          <button onClick={handleClick}>change</button>
+          <h3>Children</h3>
+          {host.chilren}
+          {/* {ReactDOM.createPortal(<h1>Liftedup</h1>, document.body)} */}
+        </div>
+      );
+    }
   },
 };
 define("my-elem", [MyElem]);
@@ -66,7 +70,7 @@ const Portal = {
   },
   render({ host }) {
     const projectedElem = <slot></slot>;
-    return host.active
+    return host.$.active
       ? ReactDOM.createPortal(projectedElem, document.body)
       : projectedElem;
   },
