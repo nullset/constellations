@@ -59,7 +59,16 @@ const App = view(({ counter }) => {
       <h1>
         {greeting} : {counter.num} : {counter.nested.value}
       </h1>
-      <aha-portal>Portaled stuff</aha-portal>
+      <no-shadow>See there is nothing</no-shadow>
+      <aha-portal>
+        <aha-basic
+          onClick={(e) => {
+            debugger;
+          }}
+        >
+          <b>Portaled stuff</b>
+        </aha-basic>
+      </aha-portal>
       <div onClick={() => console.log("click parent div")}>
         <my-elem
           // ref={blah}

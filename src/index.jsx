@@ -461,9 +461,10 @@ function define(tagName, mixins, options = {}) {
         this.shadowRoot ||
         this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
 
+      // let rootNode = this;
       const main = document.createElement("main");
       main.id = "react-mount";
-      rootNode.append(main);
+      //
 
       observe(() => {
         ReactDOM.render(
@@ -472,17 +473,19 @@ function define(tagName, mixins, options = {}) {
               this.render,
               {
                 host: this,
+                // children: this.children,
                 // Force the component to re-render any time a `$` value changes.
                 ...this.$,
-              },
-              this.children
+              }
+              // this.children
             )}
           </React.StrictMode>,
           main
         );
       });
 
-      rootNode.append(main);
+      rootNode.replaceChildren(main);
+      // rootNode.prepend(main);
     }
 
     // Bliss elements are just "bags of state" that happen to render something on the screen.
