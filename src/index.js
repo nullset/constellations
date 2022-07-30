@@ -3,15 +3,15 @@ import { render, html, svg } from "uhtml";
 import deepmerge from "deepmerge";
 
 // Polyfills
-import "construct-style-sheets-polyfill"; // Non-Chromium
+import "construct-style-sheets-polyfill"; // Non-Chromium constructed stylesheets
 import "@ungap/custom-elements"; // Safari
 
 // const Stars = new WeakMap();
 // window.Stars = Stars;
 // const Astrid = new WeakMap();
 // window.Astrid = Astrid;
-const Constellations = new Map();
-window.Constellations = Constellations;
+// const Constellations = new Map();
+// window.Constellations = Constellations;
 
 // TODO: We need to determine when a constellation will be defined. At connectedCallback is most likely. If that's the case though, then we need to cache it so it's not found on a second connectedCallback (say because the element is moved) then we don't end up with an empty state.
 
@@ -173,12 +173,10 @@ function define(tagName, mixins, options = {}) {
 
   const componentStylesheets = constructStylesheets(prototypeChain);
 
-  const createConstellationSym = Symbol("createConstellation");
+  // const createConstellationSym = Symbol("createConstellation");
   const supernovaSym = Symbol("supernova");
   class BlissElement extends baseClass {
     $ = observable(Object.create(null));
-
-    foo = 4;
 
     [isBlissElement] = true;
 
@@ -193,7 +191,7 @@ function define(tagName, mixins, options = {}) {
     constructor() {
       super();
 
-      this[createConstellationSym]();
+      // this[createConstellationSym]();
 
       // // Convert attr prop values to correct typecast values.
       // Object.values(attributePropMap).forEach((propName) => {
@@ -209,12 +207,12 @@ function define(tagName, mixins, options = {}) {
       this[componentHasLoaded] = false;
     }
 
-    // Create a constellation of all elements which reference the internal state of this element.
-    [createConstellationSym]() {
-      if (!Constellations.has(this.$)) {
-        Constellations.set(this.$, new Set([this]));
-      }
-    }
+    // // Create a constellation of all elements which reference the internal state of this element.
+    // [createConstellationSym]() {
+    //   if (!Constellations.has(this.$)) {
+    //     Constellations.set(this.$, new Set([this]));
+    //   }
+    // }
 
     // Associate a specific element's state with unique symbol, and store that reference within `this` element's state.
     cluster({ key, element }) {
@@ -230,7 +228,7 @@ function define(tagName, mixins, options = {}) {
 
       if (element.$) {
         this.$[key] = element.$;
-        Constellations.get(element.$).add(this);
+        // Constellations.get(element.$).add(this);
       } else {
         console.error(
           new Error("Element specified is not a constellation element.")
@@ -238,20 +236,20 @@ function define(tagName, mixins, options = {}) {
       }
     }
 
-    // Delete this element from any constellation whose state the element was referencing.
-    // Ensures that if no element is using an constellation's state, then the constellation is
-    // destroyed. This prevents memory leaks when elements are being created/destroyed and
-    // sharing lots of data.
-    [supernovaSym]() {
-      const entries = Constellations.entries();
-      for (let [key, asterism] of entries) {
-        asterism.delete(this);
+    // // Delete this element from any constellation whose state the element was referencing.
+    // // Ensures that if no element is using an constellation's state, then the constellation is
+    // // destroyed. This prevents memory leaks when elements are being created/destroyed and
+    // // sharing lots of data.
+    // [supernovaSym]() {
+    //   const entries = Constellations.entries();
+    //   for (let [key, asterism] of entries) {
+    //     asterism.delete(this);
 
-        if (Constellations.get(key).size === 0) {
-          Constellations.delete(key);
-        }
-      }
-    }
+    //     if (Constellations.get(key).size === 0) {
+    //       Constellations.delete(key);
+    //     }
+    //   }
+    // }
 
     setStateValue(name, value) {
       const { type = String } = flattenedPrototype.props[name];
@@ -273,7 +271,7 @@ function define(tagName, mixins, options = {}) {
     connectedCallback() {
       if (super.connectedCallback) super.connectedCallback();
 
-      this[createConstellationSym]();
+      // this[createConstellationSym]();
 
       // Set implicit slot name.
       this.slot =
@@ -438,26 +436,26 @@ function define(tagName, mixins, options = {}) {
       });
     }
 
-    // Bliss elements are just "bags of state" that happen to render something on the screen.
-    // Any bliss element can access any parent bliss element's publicly available methods, properties, etc.
-    // by calling `elem.getContext(matcher)` where `matcher` is a valid CSS selector (tag name, id, class, etc.).
-    // An element can have access to more than one parent node's contexts at any time.
-    getContext(matcher) {
-      if (typeof matcher === "string") {
-        let node = this;
-        let ctx;
-        while (!ctx && node.parentElement) {
-          node = node.parentElement;
-          if (node[isBlissElement] && node.matches(matcher)) ctx = node;
-        }
-        if (node && document.documentElement !== node) return node;
-        throw new Error(
-          `A context that matches "${matcher}" could not be found for <${this.tagName.toLowerCase()}>.`
-        );
-      } else if (matcher.nodeType) {
-        return matcher;
-      }
-    }
+    // // Bliss elements are just "bags of state" that happen to render something on the screen.
+    // // Any bliss element can access any parent bliss element's publicly available methods, properties, etc.
+    // // by calling `elem.getContext(matcher)` where `matcher` is a valid CSS selector (tag name, id, class, etc.).
+    // // An element can have access to more than one parent node's contexts at any time.
+    // getContext(matcher) {
+    //   if (typeof matcher === "string") {
+    //     let node = this;
+    //     let ctx;
+    //     while (!ctx && node.parentElement) {
+    //       node = node.parentElement;
+    //       if (node[isBlissElement] && node.matches(matcher)) ctx = node;
+    //     }
+    //     if (node && document.documentElement !== node) return node;
+    //     throw new Error(
+    //       `A context that matches "${matcher}" could not be found for <${this.tagName.toLowerCase()}>.`
+    //     );
+    //   } else if (matcher.nodeType) {
+    //     return matcher;
+    //   }
+    // }
   }
 
   // Build up our web component's prototype.
