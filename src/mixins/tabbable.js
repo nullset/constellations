@@ -34,9 +34,6 @@ export function tabbable(rootNode = "bliss-tabs") {
           observe(() => {
             this.$.active = this[self].root.$.activeTab === this[self].index;
           });
-
-          // If no tab within tabs is set to active, then set the first tab to be active by default.
-          if (!this[self].root.$.activeTab) this[self].root.$.activeTab = 0;
         },
       },
 

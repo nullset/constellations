@@ -44,9 +44,8 @@ const Tabs = {
   //   debugger;
   // },
   connectedCallback() {
-    observe(() => {
-      this.$.activeTab = this.$.activeTab ?? 0;
-    });
+    // If no tab within tabs is set to active, then set the first tab to be active by default.
+    this.$.activeTab = this.$.activeTab || 0;
   },
   render() {
     return html`
