@@ -126,8 +126,7 @@ function define(tagName, mixins, options = {}) {
   const { baseClass = HTMLElement, extend = undefined } = options;
 
   const mixinSymbols = new Set();
-  // console.log({ tagName, mixins, mixinSymbols });
-  // debugger;
+  debugger;
 
   // Add a default mixin that creates observable attributes for `hidden` and `disabled`.
   let prototypeChain = new Set([
@@ -342,6 +341,7 @@ function define(tagName, mixins, options = {}) {
     // Any event (essentially any property or attribute that starts with "on...")
     // is pre-bound so that its "this" is the custom element's host node.
     bindEvents() {
+      // TODO: i'm sure there was a reason, but why???
       preBoundEvents.forEach((event) => {
         this.addEventListener(event, this);
       });
