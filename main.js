@@ -83,21 +83,20 @@ const Tab = {
   },
   onclick(e) {
     if (!this.$.disabled) {
-      this[tabbableSym].tabsElement.$.activeTab = this[tabbableSym].$.index;
+      this[tabbableSym].root.$.activeTab = this[tabbableSym].index;
     }
   },
 };
-define("bliss-tab", [Tab], {
-  mixins: [tabbable("bliss-tabs"), keyboardNavigable],
+define("bliss-tab", [tabbable("bliss-tabs"), Tab], {
+  // mixins: [tabbable("bliss-tabs"), keyboardNavigable],
 });
 
 const TabContent = {
   connectedCallback() {
     console.log(tabbableSym, this[tabbableSym]);
-    debugger;
     observe(() => {
       const activeIsNotHost =
-        this[tabbableSym].tabsElement.$.activeTab !== this[tabbableSym].$.index;
+        this[tabbableSym].$.activeTab !== this[tabbableSym].$.index;
       this.$.hidden = activeIsNotHost;
     });
   },
@@ -105,9 +104,9 @@ const TabContent = {
     return html`<slot></slot>`;
   },
 };
-define("bliss-tab-content", TabContent, {
-  mixins: [tabbable("bliss-tabs")],
-});
+// define("bliss-tab-content", TabContent, {
+//   mixins: [tabbable("bliss-tabs")],
+// });
 define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
 import { self as fooableSym, fooable } from "./src/mixins/fooable";
@@ -132,7 +131,7 @@ const MyElem = {
     this.$[fooableSym].test = this.$[fooableSym].test + 1;
   },
 };
-define("my-elem", [fooable(), MyElem]);
+// define("my-elem", { mixins: [fooable(), MyElem] });
 
 // const myElemSym = Symbol("MyElem");
 // const OtherElem = {

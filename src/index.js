@@ -107,6 +107,8 @@ const lifecycleMethods = [
   "componentDidLoad",
 ];
 
+window.mixins = {};
+
 // const globalContext = new Set();
 // window.globalContext = globalContext;
 
@@ -122,11 +124,10 @@ function mixin(name, logic) {
 // When building prototypeChain
 // { [symbol]: logic }
 
-function define(tagName, mixins, options = {}) {
+function define(tagName, mixins = [], options = {}) {
   const { baseClass = HTMLElement, extend = undefined } = options;
 
   const mixinSymbols = new Set();
-  debugger;
 
   // Add a default mixin that creates observable attributes for `hidden` and `disabled`.
   let prototypeChain = new Set([
@@ -140,6 +141,8 @@ function define(tagName, mixins, options = {}) {
       if (Array.isArray(mixin)) {
         const [sym, mix] = mixin;
         mixinSymbols.add(sym);
+        // TODO remove windows.mixins
+        window.mixins[sym] = sym;
         return mix;
       } else {
         return mixin;
@@ -175,6 +178,7 @@ function define(tagName, mixins, options = {}) {
   // const createConstellationSym = Symbol("createConstellation");
   const supernovaSym = Symbol("supernova");
   class BlissElement extends baseClass {
+    // Create element's external observable state.
     $ = observable(Object.create(null));
 
     [isBlissElement] = true;
@@ -189,6 +193,11 @@ function define(tagName, mixins, options = {}) {
 
     constructor() {
       super();
+
+      // Create each mixins' private internal state.
+      mixinSymbols.forEach((sym) => {
+        this[sym] = { $: observable(Object.create(null)) };
+      });
 
       // this[createConstellationSym]();
 
