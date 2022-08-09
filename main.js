@@ -15,6 +15,7 @@ const Tabs = {
   styles: `
     :host nav {
       display: inline-flex;
+      gap: 1rem;
     }
   `,
   props: {
@@ -68,9 +69,6 @@ const Tab = {
     }
     :host([disabled]) {
       opacity: 0.5;
-    }
-    :host(:not(:nth-of-type(1))) {
-      margin-left: 1rem;
     }
   `,
   render() {
