@@ -8,7 +8,7 @@ import {
   // tabbableSymbol,
   tabbable,
   tabsElementSymbol,
-  self as tabbableSym,
+  symbol as tabbableSym,
 } from "./src/mixins/tabbable";
 
 const Tabs = {
@@ -80,9 +80,7 @@ const Tab = {
     }
   },
 };
-define("bliss-tab", [tabbable("bliss-tabs"), Tab], {
-  // mixins: [tabbable("bliss-tabs"), keyboardNavigable],
-});
+define("bliss-tab", [tabbable("bliss-tabs"), keyboardNavigable(), Tab]);
 
 const TabContent = {
   styles: `
@@ -102,9 +100,6 @@ const TabContent = {
     return html`<slot></slot>`;
   },
 };
-// define("bliss-tab-content", TabContent, {
-//   mixins: [tabbable("bliss-tabs")],
-// });
 define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
 import { self as fooableSym, fooable } from "./src/mixins/fooable";

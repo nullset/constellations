@@ -16,6 +16,7 @@ export function keyboardNavigable() {
           }
         });
       },
+      // FIXME: events are being overridden. Is that what we want?
       onclick(e) {
         debugger;
       },
