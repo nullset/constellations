@@ -11,10 +11,6 @@ export function tabbable(rootNode = "bliss-tabs") {
         active: { type: Boolean },
       },
       [self]: {
-        // get root() {
-        //   debugger;
-        //   return this.closest ? this.closest(rootNode) : undefined;
-        // },
         // TODO: get index() {} is NOT WORKING
         connectedCallback() {
           // Set root DOM node for the tabble plugin.
@@ -27,56 +23,17 @@ export function tabbable(rootNode = "bliss-tabs") {
           const nodes = Array.from(nodeList);
           this[self].index = nodes.findIndex((node) => node === this);
 
+          // If this.active is true, then set tabs.$.activeTab to be this tab.
           observe(() => {
-            // If this.active is true, then set tabs.$.activeTab to be this tab.
             if (this.$.active) {
-              // this[self].$.tabsElement.$.activeTab = this[self].$.index;
               this[self].root.$.activeTab = this[self].index;
             }
           });
 
+          // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
           observe(() => {
-            // if (this[self].root.$.activeTab) {
-            // debugger;
-            // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
             this.$.active = this[self].root.$.activeTab === this[self].index;
-            // }
           });
-        },
-        // connectedCallback() {
-        //   // componentDidLoad() {
-        //   // Store the element as a "real" DOM node, not a proxy of a DOM node
-        //   // this[self].$.tabsElement = raw(this.closest(rootNode));
-        //   // Reflect.getOwnPropertyDescriptor(this[self].$, 'tabsElement').value
-        //   console.log(this[self]);
-        //   // const nodeList = this[self].$.tabsElement.querySelectorAll(
-        //   //   `:scope > ${this.tagName}`
-        //   // );
-        //   debugger;
-        //   const nodeList = this.root.querySelectorAll(
-        //     `:scope > ${this.tagName}`
-        //   );
-        //   const nodes = Array.from(nodeList);
-        //   this[self].$.index = nodes.findIndex((node) => node === this);
-        //   this[self].root = this.root;
-
-        //   observe(() => {
-        //     // If this.active is true, then set tabs.$activeTab to be this tab.
-        //     if (this.$.active)
-        //       // this[self].$.tabsElement.$.activeTab = this[self].$.index;
-        //       this.root.activeTab = this[self].$.index;
-        //   });
-
-        //   observe(() => {
-        //     // If tabs.$.activeTab is this tab, then set this tab's active prop to true.
-        //     // this.$.active =
-        //     //   this[self].$.tabsElement.$.activeTab === this[self].$.index;
-        //   });
-        // },
-
-        disconnectedCallback() {
-          // if (this[self].$.tabsElement.$.activeTab === this[self].$.index)
-          //   this[self].$.tabsElement.$.activeTab = undefined;
         },
       },
 

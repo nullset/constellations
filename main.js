@@ -92,13 +92,18 @@ define("bliss-tab", [tabbable("bliss-tabs"), Tab], {
 });
 
 const TabContent = {
+  styles: `
+  :host(:not([active])) {
+    display: none;
+  }
+`,
   connectedCallback() {
-    console.log(tabbableSym, this[tabbableSym]);
-    observe(() => {
-      const activeIsNotHost =
-        this[tabbableSym].$.activeTab !== this[tabbableSym].$.index;
-      this.$.hidden = activeIsNotHost;
-    });
+    // console.log(tabbableSym, this[tabbableSym]);
+    // observe(() => {
+    //   const activeIsNotHost =
+    //     this[tabbableSym].$.activeTab !== this[tabbableSym].$.index;
+    //   this.$.hidden = activeIsNotHost;
+    // });
   },
   render() {
     return html`<slot></slot>`;
