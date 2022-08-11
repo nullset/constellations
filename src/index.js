@@ -222,27 +222,27 @@ function define(tagName, mixins = [], options = {}) {
     //   }
     // }
 
-    // Associate a specific element's state with unique symbol, and store that reference within `this` element's state.
-    cluster({ key, element }) {
-      if (key in this.$)
-        throw new Error(
-          "Constellation cannot be created: Key already exists in state.\nPlease specify a different name for the key, or, alternately, use a Symbol instead for truly unique names."
-        );
+    // // Associate a specific element's state with unique symbol, and store that reference within `this` element's state.
+    // cluster({ key, element }) {
+    //   if (key in this.$)
+    //     throw new Error(
+    //       "Constellation cannot be created: Key already exists in state.\nPlease specify a different name for the key, or, alternately, use a Symbol instead for truly unique names."
+    //     );
 
-      if (!element)
-        throw new Error(
-          "Constellation cannot be created: Element could not be found."
-        );
+    //   if (!element)
+    //     throw new Error(
+    //       "Constellation cannot be created: Element could not be found."
+    //     );
 
-      if (element.$) {
-        this.$[key] = element.$;
-        // Constellations.get(element.$).add(this);
-      } else {
-        console.error(
-          new Error("Element specified is not a constellation element.")
-        );
-      }
-    }
+    //   if (element.$) {
+    //     this.$[key] = element.$;
+    //     // Constellations.get(element.$).add(this);
+    //   } else {
+    //     console.error(
+    //       new Error("Element specified is not a constellation element.")
+    //     );
+    //   }
+    // }
 
     // // Delete this element from any constellation whose state the element was referencing.
     // // Ensures that if no element is using an constellation's state, then the constellation is
@@ -356,7 +356,7 @@ function define(tagName, mixins = [], options = {}) {
       });
     }
 
-    // Convert properties to strings and set on attributes.
+    // Convert properties to strings and set as attributes.
     // Based on `$` (state) so values are reactive.
     convertPropsToAttributes() {
       Object.entries(flattenedPrototype.props).forEach(([prop, value]) => {
