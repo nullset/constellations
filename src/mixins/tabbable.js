@@ -11,7 +11,6 @@ export function tabbable(rootNode = "bliss-tabs") {
         active: { type: Boolean },
       },
       [symbol]: {
-        // TODO: get index() {} is NOT WORKING
         connectedCallback() {
           // Set root DOM node for the tabble plugin.
           this[symbol].root = this.closest(rootNode);
