@@ -112,14 +112,6 @@ const TabContent = {
     display: none;
   }
 `,
-  connectedCallback() {
-    // console.log(tabbableSym, this[tabbableSym]);
-    // observe(() => {
-    //   const activeIsNotHost =
-    //     this[tabbableSym].$.activeTab !== this[tabbableSym].$.index;
-    //   this.$.hidden = activeIsNotHost;
-    // });
-  },
   render() {
     return html`<slot></slot>`;
   },
