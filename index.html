@@ -43,7 +43,7 @@
         () => {
           console.log("run each time 11");
           // Must be declared with `||=`, otherwise will be reset on each re-render.
-          this.$.messages ||= [];
+          this.$.messages = [];
 
           const generateMessage = () => {
             const time = performance.now();
