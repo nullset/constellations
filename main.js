@@ -11,6 +11,53 @@ import {
   symbol as tabbableSym,
 } from "./src/mixins/tabbable";
 
+// const Tabs = {
+//   styles: `
+//     :host nav {
+//       display: inline-flex;
+//       gap: 1rem;
+//     }
+//   `,
+//   props: {
+//     activeTab: { type: Number, default: 0 },
+//   },
+//   // constructorCallback() {
+//   //   console.log("CONSTRUCTOR", this);
+//   //   debugger;
+//   // },
+//   // componentWillLoad() {
+//   //   return {
+//   //     promise: new Promise((resolve, reject) => {
+//   //       setTimeout(() => {
+//   //         resolve("aoeu");
+//   //       }, 3000);
+//   //     }),
+//   //     placeholder: html`FOO BAR`,
+//   //     error: {
+//   //       message: html`This is an error`,
+//   //       callback: function () {
+//   //         console.log("ERROR", this);
+//   //       },
+//   //     },
+//   //   };
+//   // },
+//   // componentDidLoad() {
+//   //   debugger;
+//   // },
+//   render() {
+//     return html`
+//       ${this.$.activeTab}
+//       <nav part="tabs">
+//         <slot name="tab"></slot>
+//       </nav>
+//       <div part="content">
+//         <slot name="tab-content"></slot>
+//       </div>
+//     `;
+//   },
+// };
+// define("bliss-tabs", [Tabs]);
+
 const Tabs = {
   styles: `
     :host nav {
@@ -21,29 +68,6 @@ const Tabs = {
   props: {
     activeTab: { type: Number, default: 0 },
   },
-  // constructorCallback() {
-  //   console.log("CONSTRUCTOR", this);
-  //   debugger;
-  // },
-  // componentWillLoad() {
-  //   return {
-  //     promise: new Promise((resolve, reject) => {
-  //       setTimeout(() => {
-  //         resolve("aoeu");
-  //       }, 3000);
-  //     }),
-  //     placeholder: html`FOO BAR`,
-  //     error: {
-  //       message: html`This is an error`,
-  //       callback: function () {
-  //         console.log("ERROR", this);
-  //       },
-  //     },
-  //   };
-  // },
-  // componentDidLoad() {
-  //   debugger;
-  // },
   render() {
     return html`
       ${this.$.activeTab}
