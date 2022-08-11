@@ -8,21 +8,13 @@ export function keyboardNavigable() {
     {
       props: { tabindex: { type: Number, default: 0 } },
 
-      // FIXME: get index() {} is NOT WORKING
-      get x() {
-        // debugger;
-      },
-      // FIXME: events are being overridden. Is that what we want?
-      onclick(e) {
-        debugger;
-      },
-
       connectedCallback() {
         // If the element's disabled is set, then make the element not navigable by tabbing.
         observe(() => {
           this.tabindex = this.disabled ? -1 : 0;
         });
 
+        // If user tabs to the element and presses "Enter" or "Space" then click the element.
         this.addEventListener("keypress", (e) => {
           if (
             e.target === this &&

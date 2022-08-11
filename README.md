@@ -4,6 +4,10 @@
 - Each mixin can access the "master" state (element.$), or its own internal state (element[SymbolName].$).
 - Each state object is an observable.
 
+- Any plugin can have its own event handlers.
+  - Override the previously defined `onclick`
+  - Assign in `constructorCallback() { this.addEventListener('click'); }`
+
 ### Mixins
 
 ##### Keyboard navigable
