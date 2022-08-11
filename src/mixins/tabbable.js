@@ -1,6 +1,5 @@
 import { observe, observable, raw } from "../index";
 
-export const tabsElementSymbol = Symbol("tabs");
 export const symbol = Symbol("tabbable");
 
 export function tabbable(rootNode = "bliss-tabs") {
@@ -36,9 +35,6 @@ export function tabbable(rootNode = "bliss-tabs") {
           });
         },
       },
-
-      // [tabsElementSymbol]: undefined,
-
       activeIsHost() {
         debugger;
       },

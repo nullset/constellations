@@ -1,15 +1,6 @@
 import { html, define, observe, observable, raw, render } from "./src/index";
-import {
-  symbol as keyboardNavigableSymbol,
-  keyboardNavigable,
-} from "./src/mixins/keyboardNavigable";
-
-import {
-  // tabbableSymbol,
-  tabbable,
-  tabsElementSymbol,
-  symbol as tabbableSym,
-} from "./src/mixins/tabbable";
+import { keyboardNavigable } from "./src/mixins/keyboardNavigable";
+import { tabbable, symbol as tabbableSym } from "./src/mixins/tabbable";
 
 // const Tabs = {
 //   styles: `
@@ -117,6 +108,30 @@ const TabContent = {
   },
 };
 define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
+
+const BV = new WeakMap();
+const BlissValue = {
+  props: {
+    debugger: { type: Boolean, default: false },
+  },
+  onslotchange(e) {
+    const textContents = e.target.assignedNodes();
+    if (textContents.length === 1) {
+      const script = document.createElement("script");
+      script.textContent = `(function() { ; ${textContents[0].textContent} })();`;
+      e.target.insertAdjacentElement("afterend", script);
+      if (!this.debugger) {
+        textContents.forEach((node) => node.remove());
+        e.target.remove();
+        script.remove();
+      }
+    }
+  },
+  render() {
+    return html` <slot onslotchange=${this.onslotchange}></slot> `;
+  },
+};
+define("bliss-value", [BlissValue]);
 
 import { self as fooableSym, fooable } from "./src/mixins/fooable";
 window.fb = fooableSym;
