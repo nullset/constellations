@@ -41,17 +41,23 @@
     <r-1>
       <script slot="script">
         () => {
+          console.log("run each time 11");
           // Must be declared with `||=`, otherwise will be reset on each re-render.
           this.$.messages ||= [];
 
           const generateMessage = () => {
-            const time = Date.now();
+            const time = performance.now();
             this.$.messages.push({
               time,
               text: `A message at ${time}`,
             });
           };
-          return html`
+
+          queueMicrotask(() => {
+            console.log(this.$.messages.length);
+          });
+
+          return () => html`
             <div style="display: flex; gap: 1em;">
               <aside style="flex: 1 1;">
                 <button @click=${generateMessage}>Create message</button>
@@ -71,13 +77,18 @@
       </script>
     </r-1>
 
-    <r-1 isolate>
+    <!-- <r-1 isolate>
       <script slot="script">
-        () =>
-          html`<p>${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}</p>`;
+        () => {
+          console.log("run each time");
+
+          return html`<p>
+            ${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}
+          </p>`;
+        };
         // alert(1);
       </script>
-    </r-1>
+    </r-1> -->
 
     <bliss-tabs>
       <bliss-tab>One</bliss-tab>
@@ -126,6 +137,10 @@
       </bliss-tab-content>
     </bliss-tabs>
 
-    <bliss-value>alert()</bliss-value>
+    <bliss-value>
+      { render({html}) { return html`
+      <h1 style="color: red">OEEOUEOUOE</h1>
+      ` } }
+    </bliss-value>
   </body>
 </html>

@@ -115,17 +115,35 @@ const BlissValue = {
     debugger: { type: Boolean, default: false },
   },
   onslotchange(e) {
-    const textContents = e.target.assignedNodes();
-    if (textContents.length === 1) {
-      const script = document.createElement("script");
-      script.textContent = `(function() { ; ${textContents[0].textContent} })();`;
-      e.target.insertAdjacentElement("afterend", script);
-      if (!this.debugger) {
-        textContents.forEach((node) => node.remove());
-        e.target.remove();
-        script.remove();
-      }
-    }
+    // const textContents = e.target.assignedNodes();
+    // if (textContents.length === 1) {
+    //   const script = document.createElement("script");
+    //   script.textContent = `(function() { ; ${textContents[0].textContent} })();`;
+    //   e.target.insertAdjacentElement("afterend", script);
+    //   if (!this.debugger) {
+    //     textContents.forEach((node) => node.remove());
+    //     e.target.remove();
+    //     script.remove();
+    //   }
+    // }
+
+    const host = e.target.getRootNode().host;
+    const obj = new Function(`; return ${host.textContent.trim()};`);
+
+    // const elem = obj.render({ html });
+    // debugger;
+
+    // function process(strings, ...values) {
+    //   debugger;
+    //   let str = "";
+    //   strings.forEach((string, i) => {
+    //     str += string + values[i];
+    //   });
+    //   return str;
+    // }
+
+    // console.log(process(`${fn}`));
+    // debugger;
   },
   render() {
     return html` <slot onslotchange=${this.onslotchange}></slot> `;
@@ -218,10 +236,15 @@ const RenderElem = {
 
     const host = e.target.getRootNode().host;
     const frag = new DocumentFragment();
-    const func = new Function("html", "observe", `return ${text};`);
+
+    const renderFn = new Function("html", "observe", `return ${text};`).call(
+      host,
+      html,
+      observe
+    )();
+
     observe(() => {
-      const elems = func.call(host, html, observe);
-      if (elems) render(frag, elems);
+      render(frag, renderFn());
     });
 
     if (host.isolate) {
