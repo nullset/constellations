@@ -1,4 +1,14 @@
-import { html, define, observe, observable, raw, render } from "./src/index";
+import {
+  html,
+  define,
+  observe,
+  unobserve,
+  observable,
+  raw,
+  render,
+  // foreign,
+  // ref,
+} from "./src/index";
 import { keyboardNavigable } from "./src/mixins/keyboardNavigable";
 import { tabbable, symbol as tabbableSym } from "./src/mixins/tabbable";
 
@@ -109,48 +119,6 @@ const TabContent = {
 };
 define("bliss-tab-content", [tabbable("bliss-tabs"), TabContent]);
 
-const BV = new WeakMap();
-const BlissValue = {
-  props: {
-    debugger: { type: Boolean, default: false },
-  },
-  onslotchange(e) {
-    // const textContents = e.target.assignedNodes();
-    // if (textContents.length === 1) {
-    //   const script = document.createElement("script");
-    //   script.textContent = `(function() { ; ${textContents[0].textContent} })();`;
-    //   e.target.insertAdjacentElement("afterend", script);
-    //   if (!this.debugger) {
-    //     textContents.forEach((node) => node.remove());
-    //     e.target.remove();
-    //     script.remove();
-    //   }
-    // }
-
-    const host = e.target.getRootNode().host;
-    const obj = new Function(`; return ${host.textContent.trim()};`);
-
-    // const elem = obj.render({ html });
-    // debugger;
-
-    // function process(strings, ...values) {
-    //   debugger;
-    //   let str = "";
-    //   strings.forEach((string, i) => {
-    //     str += string + values[i];
-    //   });
-    //   return str;
-    // }
-
-    // console.log(process(`${fn}`));
-    // debugger;
-  },
-  render() {
-    return html` <slot onslotchange=${this.onslotchange}></slot> `;
-  },
-};
-define("bliss-value", [BlissValue]);
-
 import { self as fooableSym, fooable } from "./src/mixins/fooable";
 window.fb = fooableSym;
 
@@ -173,38 +141,11 @@ const MyElem = {
     this.$[fooableSym].test = this.$[fooableSym].test + 1;
   },
 };
-// define("my-elem", { mixins: [fooable(), MyElem] });
-
-// const myElemSym = Symbol("MyElem");
-// const OtherElem = {
-//   props: {
-//     name: { type: String, default: "OtherElem" },
-//   },
-//   connectedCallback() {
-//     this.cluster({ key: "MyElem", element: this.previousElementSibling });
-//   },
-//   render() {
-//     const state = this.previousElementSibling.$;
-//     return html`Other: ${state[fooableSym].test}`;
-//   },
-// };
-// define("other-elem", [OtherElem]);
-
-// const ThirdElem = {
-//   props: {
-//     name: { type: String, default: "ThirdElem" },
-//   },
-//   connectedCallback() {
-//     // this.cluster({ key: "MyElem", element: this.previousElementSibling });
-//   },
-//   render() {
-//     // const state = this.previousElementSibling.$;
-//     return html`Third ELEM `;
-//   },
-// };
-// define("third-elem", [OtherElem, ThirdElem]);
 
 const cacheSym = Symbol("cacheSym");
+const disconnectedCallbackSym = Symbol("disconnectedCallbackSym");
+
+// TODO: Can RenderElem import 3rd party libraries??
 const RenderElem = {
   // shadowClosed: true,  // FIXME: if we set to true, then $ reactions don't seem to work.
   props: {
@@ -214,7 +155,12 @@ const RenderElem = {
   },
   connectedCallback() {
     this[cacheSym] = undefined;
+    this.$.refs = {};
     this.$.monkey = "Ceasar";
+  },
+  disconnectedCallback() {
+    // TODO: Test me!
+    if (this[disconnectedCallbackSym]) this.disconnectedCallback.call(this);
   },
   handleSlotChange(e) {
     const script = e.target
@@ -237,14 +183,36 @@ const RenderElem = {
     const host = e.target.getRootNode().host;
     const frag = new DocumentFragment();
 
-    const renderFn = new Function("html", "observe", `return ${text};`).call(
-      host,
-      html,
-      observe
-    )();
+    // console.log({ text });
+    // const obj = {
+    //   render: new Function(
+    //     "html",
+    //     "observe",
+    //     "unobserve",
+    //     `return ${text};`
+    //   ).call(host, html, observe, unobserve)(),
+    // };
+    const blissObj = new Function(
+      "html",
+      "observe",
+      "unobserve",
+      `return ${text};`
+    ).call(host, html, observe, unobserve)();
+
+    const proxiedHost = Object.assign(host, blissObj);
+
+    // Bind all functions to have their `this` be the host element.
+    Object.entries(blissObj).forEach(([key, value]) => {
+      if (typeof value === "function") {
+        proxiedHost[key] = proxiedHost[key].bind(proxiedHost);
+      }
+    });
+
+    // Call any specified `connectedCallback` function.
+    proxiedHost.connectedCallback && proxiedHost.connectedCallback();
 
     observe(() => {
-      render(frag, renderFn());
+      render(frag, proxiedHost.render.call(proxiedHost, html));
     });
 
     if (host.isolate) {
