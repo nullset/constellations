@@ -1,3 +1,7 @@
+// A mixin should be a function that returns an array.
+// First item in the array is the symbol of the mixin. This allows for private methods/variables not just within components but within _mixins_.
+// Second item in the array is the mixin object. It follows the same conventions as building a regular bliss element (connectedCallback, etc.).
+
 import { observe, observable, raw } from "../index";
 
 export const symbol = Symbol("tabbable");
@@ -34,9 +38,6 @@ export function tabbable(rootNode = "bliss-tabs") {
               this[symbol].root.$.activeTab === this[symbol].index;
           });
         },
-      },
-      activeIsHost() {
-        debugger;
       },
     },
   ];
