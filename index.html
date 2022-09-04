@@ -16,9 +16,13 @@
     </style>
   </head>
   <body>
+    <r-1></r-1>
     <r-1>
       <script slot="script">
         () => ({
+          styles: `
+            li {border: 1px solid blue}
+          `,
           connectedCallback() {
             this.$.messages = [];
           },
@@ -38,6 +42,7 @@
                   <button @click=${this.generateMessage}>Create message</button>
                 </aside>
                 <main style="flex: 2 1;">
+                  <i>${this.$.monkey}</i>
                   <b>Messages length: ${this.$.messages.length}</b>
 
                   <ol

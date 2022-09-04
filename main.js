@@ -152,12 +152,49 @@ const RenderElem = {
     slot: { type: String, default: undefined },
     isolate: { type: Boolean, default: false },
     bar: { type: Number, default: 33 },
+    uuid: { type: String },
+  },
+  scopeStyles() {
+    const host = this;
+    this.uuid = `${this.tagName}--${Array.from(
+      document.querySelectorAll(this.tagName)
+    ).indexOf(this)}`;
+
+    if (this.styles) {
+      // Read the styles and scope them to this element instance.
+      const sheet = new CSSStyleSheet();
+      sheet.replace(this.styles);
+      Object.values(sheet.cssRules).forEach((value) => {
+        value.selectorText = value.selectorText.replace(
+          /((?:(["'])(\\.|(?!\1)[^\\])*\1|\[(?:(["'])(\\.|(?!\2)[^\\])*\2|[^\]])*\]|\((?:(["'])(\\.|(?!\3)[^\\])*\3|[^)])*\)|[^,])+)/g,
+          (match) => {
+            match = match.trim();
+            if (/^:host/.test(match)) {
+              // Replace any :host or :host(...) values with correctly scoped CSS.
+              return match.replace(
+                /(:host)\((.*?)\)/,
+                `${host.tagName}[uuid="${host.uuid}"]$2`
+              );
+            } else {
+              // Otherwise scope all style rules by the uuid.
+              return `${host.tagName}[uuid="${host.uuid}"] ${match}`;
+            }
+          }
+        );
+      });
+
+      // Adopt the stylesheet so it is applied.
+      host.getRootNode().adoptedStyleSheets = [sheet];
+    }
   },
   connectedCallback() {
     this[cacheSym] = undefined;
     this.$.refs = {};
     this.$.monkey = "Ceasar";
+
+    this.scopeStyles();
   },
+
   disconnectedCallback() {
     // TODO: Test me!
     if (this[disconnectedCallbackSym]) this.disconnectedCallback.call(this);
@@ -230,6 +267,9 @@ const RenderElem = {
     :host([isolate]) *, :host([isolate]) *::before, :host([isolate]) *::after {
       all: initial;
       box-sizing: border-box;
+    }
+    * {
+      color: orange;
     }
   `,
   render() {

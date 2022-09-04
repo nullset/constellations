@@ -154,6 +154,7 @@ function define(tagName, mixins = [], options = {}) {
   const observedAttrs = new Set();
   const attributePropMap = new Map();
 
+  // Covert props names to snake case attribute names (unless otherwise specified by an `attribute` in the props hash).
   Object.entries(flattenedPrototype.props).forEach((item) => {
     const [propName, { attribute }] = item;
     const attributeName = attribute || pascalCaseToSnakeCase(propName);
@@ -263,16 +264,6 @@ function define(tagName, mixins = [], options = {}) {
           val = String(value);
         }
         return val;
-        // if (value && stringIsObject.test(value)) {
-        //   try {
-        //     return JSON.parse(value);
-        //   } catch (e) {
-        //     console.error(e);
-        //     return {};
-        //   }
-        // } else {
-        //   return String(value);
-        // }
       }
     }
 
