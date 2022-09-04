@@ -163,7 +163,7 @@ const RenderElem = {
     if (this.styles) {
       // Read the styles and scope them to this element instance.
       const sheet = new CSSStyleSheet();
-      sheet.replace(this.styles);
+      sheet.replaceSync(this.styles);
       Object.values(sheet.cssRules).forEach((value) => {
         value.selectorText = value.selectorText.replace(
           /((?:(["'])(\\.|(?!\1)[^\\])*\1|\[(?:(["'])(\\.|(?!\2)[^\\])*\2|[^\]])*\]|\((?:(["'])(\\.|(?!\3)[^\\])*\3|[^)])*\)|[^,])+)/g,
