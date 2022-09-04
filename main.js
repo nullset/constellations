@@ -173,18 +173,29 @@ const RenderElem = {
               // Replace any :host or :host(...) values with correctly scoped CSS.
               return match.replace(
                 /(:host)\((.*?)\)/,
-                `${host.tagName}[uuid="${host.uuid}"]$2`
+                `${host.tagName.toLowerCase()}[uuid="${host.uuid}"]$2`
               );
             } else {
               // Otherwise scope all style rules by the uuid.
-              return `${host.tagName}[uuid="${host.uuid}"] ${match}`;
+              return `${host.tagName.toLowerCase()}[uuid="${
+                host.uuid
+              }"] ${match}`;
             }
           }
         );
       });
 
+      // FIXME: Technically this shouldn't be necessary, but is included to fix a bug in Safari 15.6 (and perhaps other versions).
+      // While Safari does take the above code and correctly update the `selectorText` value, somehow it manges the scoped styling when applying it to the document and instead applies all of the styles to the `:root`, which is beyond broken, because it's both something that would not happen with the original selectors AND not happen with the updated selectors. ~IE~ ... I mean Safari ... should really up their game.
+      let styles = "";
+      Object.values(sheet.cssRules).forEach((value) => {
+        styles += value.cssText;
+      });
+      const scopedSheet = new CSSStyleSheet();
+      scopedSheet.replaceSync(styles);
+
       // Adopt the stylesheet so it is applied.
-      host.getRootNode().adoptedStyleSheets = [sheet];
+      host.getRootNode().adoptedStyleSheets = [scopedSheet];
     }
   },
   connectedCallback() {
@@ -270,6 +281,7 @@ const RenderElem = {
     }
     * {
       color: orange;
+      box-sizing: border-box;
     }
   `,
   render() {
