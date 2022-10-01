@@ -222,14 +222,6 @@ function define(tagName, mixins = [], options = {}) {
     connectedCallback() {
       if (super.connectedCallback) super.connectedCallback();
 
-      // Set implicit slot name.
-      this.slot =
-        this.getAttribute("is") ||
-        (this.hasAttribute("slot")
-          ? this.getAttribute("slot")
-          : this.tagName.toLowerCase()
-        ).replace(/^.*?-/, "");
-
       // Convert all props to reflected attributes.
       this.convertPropsToAttributes();
 

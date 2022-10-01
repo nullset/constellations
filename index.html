@@ -16,126 +16,9 @@
     </style>
   </head>
   <body>
-    <r-1></r-1>
-    <r-1>
-      <script slot="script">
-        () => ({
-          styles: `
-            li {border: 1px solid blue}
-          `,
-          connectedCallback() {
-            this.$.messages = [];
-          },
-          generateMessage() {
-            const time = performance.now();
-            this.$.messages.push({
-              time,
-              text: `A message at ${time}`,
-            });
-          },
-
-          render(html) {
-            console.log({ html, this: this });
-            return html`
-              <div style="display: flex; gap: 1em;">
-                <aside style="flex: 1 1;">
-                  <button @click=${this.generateMessage}>Create message</button>
-                </aside>
-                <main style="flex: 2 1;">
-                  <i>${this.$.monkey}</i>
-                  <b>Messages length: ${this.$.messages.length}</b>
-
-                  <ol
-                    ref=${(elem) => {
-                      // elem.addEventListener("click", () =>
-                      //   console.log("CLICKED")
-                      // );
-                      this.$.refs.list = elem;
-                    }}
-                  >
-                    ${this.$.messages.map((m) => {
-                      return html`<li>${m.time} : ${m.text}</li>`;
-                    })}
-                  </ol>
-                </main>
-              </div>
-            `;
-          },
-        });
-
-        // () => {
-        //   console.log("run each time 11");
-        //   // Must be declared with `||=`, otherwise will be reset on each re-render.
-        //   this.$.messages = [];
-
-        //   const handler = (node, name, value) => {
-        //     debugger;
-        //     queueMicrotask;
-        //     // P, any, {data: 123}
-        //     console.log(node, name, value);
-        //     // return null/undefined to remove it
-        //     return value.data;
-        //   };
-
-        //   const generateMessage = () => {
-        //     const time = performance.now();
-        //     this.$.messages.push({
-        //       time,
-        //       text: `A message at ${time}`,
-        //     });
-        //   };
-
-        //   // const useCallback = observe(() => {
-        //   //   console.log("----", this.$.refs.list);
-        //   //   debugger;
-        //   // });
-        //   // unobserve(useCallback);
-
-        //   return () => {
-        //     return html`
-        //       <div style="display: flex; gap: 1em;">
-        //         <aside style="flex: 1 1;">
-        //           <button @click=${generateMessage}>Create message</button>
-        //         </aside>
-        //         <main style="flex: 2 1;">
-        //           <b>Messages length: ${this.$.messages.length}</b>
-
-        //           <ol
-        //             ref=${(elem) => {
-        //               // elem.addEventListener("click", () =>
-        //               //   console.log("CLICKED")
-        //               // );
-        //               this.$.refs.list = elem;
-        //             }}
-        //           >
-        //             ${this.$.messages.map((m) => {
-        //               return html`<li>${m.time} : ${m.text}</li>`;
-        //             })}
-        //           </ol>
-        //         </main>
-        //       </div>
-        //     `;
-        //   };
-        // };
-      </script>
-    </r-1>
-
-    <!-- <r-1 isolate>
-      <script slot="script">
-        () => {
-          console.log("run each time");
-
-          return html`<p>
-            ${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}
-          </p>`;
-        };
-        // alert(1);
-      </script>
-    </r-1> -->
-
     <bliss-tabs>
-      <bliss-tab>One</bliss-tab>
-      <bliss-tab-content>
+      <bliss-tab slot="tab">One</bliss-tab>
+      <bliss-tab-content slot="tab-content">
         <p>
           Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
           nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
@@ -148,8 +31,8 @@
         </p>
       </bliss-tab-content>
 
-      <bliss-tab active>Two</bliss-tab>
-      <bliss-tab-content>
+      <bliss-tab slot="tab" active>Two</bliss-tab>
+      <bliss-tab-content slot="tab-content">
         <p>
           Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
           dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
@@ -160,22 +43,28 @@
         </p>
       </bliss-tab-content>
 
-      <bliss-tab disabled>Three</bliss-tab>
-      <bliss-tab-content>
+      <bliss-tab slot="tab" disabled>Three</bliss-tab>
+      <bliss-tab-content slot="tab-content">
         <p>More stuff for third tab</p>
       </bliss-tab-content>
 
-      <bliss-tab>Four</bliss-tab>
-      <bliss-tab-content>
+      <bliss-tab slot="tab">Four</bliss-tab>
+      <bliss-tab-content slot="tab-content">
         <p>This section has sub-tabs!</p>
 
-        <bliss-tabs slot>
-          <bliss-tab>Four.One</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.1</p></bliss-tab-content>
-          <bliss-tab>Four.Two</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.2</p></bliss-tab-content>
-          <bliss-tab>Four.Three</bliss-tab>
-          <bliss-tab-content><p>Stuff for 4.3</p></bliss-tab-content>
+        <bliss-tabs>
+          <bliss-tab slot="tab">Four.One</bliss-tab>
+          <bliss-tab-content slot="tab-content">
+            <p>Stuff for 4.1</p>
+          </bliss-tab-content>
+          <bliss-tab slot="tab">Four.Two</bliss-tab>
+          <bliss-tab-content slot="tab-content">
+            <p>Stuff for 4.2</p>
+          </bliss-tab-content>
+          <bliss-tab slot="tab">Four.Three</bliss-tab>
+          <bliss-tab-content slot="tab-content">
+            <p>Stuff for 4.3</p>
+          </bliss-tab-content>
         </bliss-tabs>
       </bliss-tab-content>
     </bliss-tabs>
