@@ -18,106 +18,29 @@
   <body>
     <r-1></r-1>
     <r-1>
-      <script slot="script">
-        () => ({
-          styles: `
-            li {border: 1px solid blue}
-          `,
-          connectedCallback() {
-            this.$.messages = [];
-          },
-          generateMessage() {
-            const time = performance.now();
-            this.$.messages.push({
-              time,
-              text: `A message at ${time}`,
-            });
-          },
+      <template slot="template">
+        () => ({ styles: ` li {border: 1px solid blue} `, connectedCallback() {
+        this.$.messages = []; }, generateMessage() { const time =
+        performance.now(); this.$.messages.push({ time, text: `A message at
+        ${time}`, }); }, render(html) { console.log({ html, this: this });
+        return html`
+        <div style="display: flex; gap: 1em">
+          <aside style="flex: 1 1">
+            <button @click="${this.generateMessage}">Create message</button>
+          </aside>
+          <main style="flex: 2 1">
+            <i>${this.$.monkey}</i>
+            <b>Messages length: ${this.$.messages.length}</b>
 
-          render(html) {
-            console.log({ html, this: this });
-            return html`
-              <div style="display: flex; gap: 1em;">
-                <aside style="flex: 1 1;">
-                  <button @click=${this.generateMessage}>Create message</button>
-                </aside>
-                <main style="flex: 2 1;">
-                  <i>${this.$.monkey}</i>
-                  <b>Messages length: ${this.$.messages.length}</b>
-
-                  <ol
-                    ref=${(elem) => {
-                      // elem.addEventListener("click", () =>
-                      //   console.log("CLICKED")
-                      // );
-                      this.$.refs.list = elem;
-                    }}
-                  >
-                    ${this.$.messages.map((m) => {
-                      return html`<li>${m.time} : ${m.text}</li>`;
-                    })}
-                  </ol>
-                </main>
-              </div>
-            `;
-          },
-        });
-
-        // () => {
-        //   console.log("run each time 11");
-        //   // Must be declared with `||=`, otherwise will be reset on each re-render.
-        //   this.$.messages = [];
-
-        //   const handler = (node, name, value) => {
-        //     debugger;
-        //     queueMicrotask;
-        //     // P, any, {data: 123}
-        //     console.log(node, name, value);
-        //     // return null/undefined to remove it
-        //     return value.data;
-        //   };
-
-        //   const generateMessage = () => {
-        //     const time = performance.now();
-        //     this.$.messages.push({
-        //       time,
-        //       text: `A message at ${time}`,
-        //     });
-        //   };
-
-        //   // const useCallback = observe(() => {
-        //   //   console.log("----", this.$.refs.list);
-        //   //   debugger;
-        //   // });
-        //   // unobserve(useCallback);
-
-        //   return () => {
-        //     return html`
-        //       <div style="display: flex; gap: 1em;">
-        //         <aside style="flex: 1 1;">
-        //           <button @click=${generateMessage}>Create message</button>
-        //         </aside>
-        //         <main style="flex: 2 1;">
-        //           <b>Messages length: ${this.$.messages.length}</b>
-
-        //           <ol
-        //             ref=${(elem) => {
-        //               // elem.addEventListener("click", () =>
-        //               //   console.log("CLICKED")
-        //               // );
-        //               this.$.refs.list = elem;
-        //             }}
-        //           >
-        //             ${this.$.messages.map((m) => {
-        //               return html`<li>${m.time} : ${m.text}</li>`;
-        //             })}
-        //           </ol>
-        //         </main>
-        //       </div>
-        //     `;
-        //   };
-        // };
-      </script>
+            <ol>
+              ${this.$.messages.map((m) => { return html`
+              <li>${m.time} : ${m.text}</li>
+              `; })}
+            </ol>
+          </main>
+        </div>
+        `; }, });
+      </template>
     </r-1>
 
     <!-- <r-1 isolate>

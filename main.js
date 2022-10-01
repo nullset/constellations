@@ -211,20 +211,20 @@ const RenderElem = {
     if (this[disconnectedCallbackSym]) this.disconnectedCallback.call(this);
   },
   handleSlotChange(e) {
-    const script = e.target
+    const template = e.target
       .assignedElements()
-      .find((e) => e.tagName === "SCRIPT");
-    if (!script) return;
+      .find((e) => e.tagName === "TEMPLATE");
+    if (!template) return;
 
-    const text = script.innerText.trim();
+    const text = template.innerText.trim();
 
-    // If the script's text hasn't been updated, no need to re-render.
+    // If the template's text hasn't been updated, no need to re-render.
     if (this[cacheSym] === text) {
-      script.remove();
+      template.remove();
       return;
     }
 
-    // The script's text HAS been updated, so throw away existing DOM and re-render.
+    // The template's text HAS been updated, so throw away existing DOM and re-render.
     // Note that state is maintained across re-rerenders, even if DOM is not.
     this[cacheSym] = text;
 
@@ -286,7 +286,7 @@ const RenderElem = {
   `,
   render() {
     return html`
-      <slot name="script" onslotchange=${this.handleSlotChange}></slot>
+      <slot name="template" onslotchange=${this.handleSlotChange}></slot>
       <slot></slot>
     `;
   },
