@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 specifiers:
   '@nx-js/observer-util': ^4.2.2
@@ -6,7 +6,7 @@ specifiers:
   construct-style-sheets-polyfill: ^3.0.5
   deepmerge: ^4.2.2
   proxy-pants: ^0.4.3
-  uhtml: ^2.8.0
+  uhtml: ^3.0.0
   vite: ^2.7.2
   weak-value: ^0.2.3
 
@@ -16,7 +16,7 @@ dependencies:
   construct-style-sheets-polyfill: 3.0.5
   deepmerge: 4.2.2
   proxy-pants: 0.4.3
-  uhtml: 2.8.0
+  uhtml: 3.0.1
   weak-value: 0.2.3
 
 devDependencies:
@@ -29,12 +29,20 @@ packages:
     engines: {node: '>=6.5.0'}
     dev: false
 
-  /@ungap/create-content/0.3.1:
-    resolution: {integrity: sha512-SHzmtS3KHG+gzNhO/E0tFqs12vNC5H3YxpF8a8AeodB/iX3ZYcxzS8vgWXbDGmHy6bgl7m+f9+wDKBdqOVT5FA==}
-    dev: false
-
   /@ungap/custom-elements/1.0.0:
     resolution: {integrity: sha512-zRcRmCA3HdAKVbeXP+b0/Vsp0LGitm/h1+zRx1S8TyKPFRCMxUtpRlGcS9SBN81oOwNOBUoibR6bbuoG/DiUsA==}
+    dev: false
+
+  /@webreflection/mapset/1.0.1:
+    resolution: {integrity: sha512-cfHPwoviBs7Y/sewLQqE6Ic3XJfUr+LbNEYtR2uW4Od41y5Mg8TTQ8hUb3zBp3cepZTPpwhI6YMnjWk+olqO2w==}
+    dev: false
+
+  /@webreflection/uparser/0.2.4:
+    resolution: {integrity: sha512-4cYSODHAbjsIlvlTLffaN+QiFcNSLTYkRLOrDqpK+m6Bzqyjudq/xHTiSl4/LxeijcQE48nJQuaBnJcnizXxrA==}
+    dev: false
+
+  /@webreflection/uwire/1.2.1:
+    resolution: {integrity: sha512-3FIqIFzqij5NPWKWCQKJhfcRQpfS8RHAcceFosSDDiD6WrMHRAp3QoBqYt7dfrPhJ8Fg2b6T6Ea8ttClzVkZHA==}
     dev: false
 
   /async-tag/0.2.0:
@@ -308,32 +316,16 @@ packages:
       uarray: 1.0.0
     dev: false
 
-  /uhtml/2.8.0:
-    resolution: {integrity: sha512-UVtSfxRh06r06xQguEyWyQF2E6x9CbtxqRTG7gLunrTKO4y223+yRkrB0wiPFSaU5qdscDO5LAi65oFQk839zg==}
+  /uhtml/3.0.1:
+    resolution: {integrity: sha512-faYAYvr5lucYWco4A2ggMbYnCzkzuqzxv9TKYqD5tLlFYtMgokbvrbVEBRvebVHIF2gd68kxZhZMktH75wNcWg==}
     dependencies:
-      '@ungap/create-content': 0.3.1
+      '@webreflection/mapset': 1.0.1
+      '@webreflection/uparser': 0.2.4
+      '@webreflection/uwire': 1.2.1
       async-tag: 0.2.0
       jsx2tag: 0.3.0
-      uarray: 1.0.0
       udomdiff: 1.1.0
       uhandlers: 0.6.1
-      umap: 1.0.2
-      uparser: 0.2.1
-      uwire: 1.1.0
-    dev: false
-
-  /umap/1.0.2:
-    resolution: {integrity: sha512-bW127HgG4H4VAD6qlqO5vCC+7bnlYvZ6A6BdwyGblkWvlEG7VYpj1bcpf3iJpvyKmkPZWDIeZDmoULz67ec7NA==}
-    dev: false
-
-  /uparser/0.2.1:
-    resolution: {integrity: sha512-hTwK8e+bAaER8gJBOysoFGjRPsX/xOthSPR/ieI9EgTf1rts9ey25tbDXIU0rDr/cGcLsvkCo1n8J/eccfAvvw==}
-    dev: false
-
-  /uwire/1.1.0:
-    resolution: {integrity: sha512-XJPmJnySabt8D0/wnfFFywgUOBnXszDEW32nEVIfOx1n6gLTZSp+X+70+blSnHKNiIUVSFPmmRuxOal0I/aB5g==}
-    dependencies:
-      uarray: 1.0.0
     dev: false
 
   /vite/2.7.12:

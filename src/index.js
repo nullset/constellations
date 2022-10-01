@@ -1,9 +1,9 @@
-import { observable, observe, raw } from "@nx-js/observer-util";
+import { observable, observe, unobserve, raw } from "@nx-js/observer-util";
 import { render, html, svg } from "uhtml";
 import deepmerge from "deepmerge";
 
 // Polyfills
-import "construct-style-sheets-polyfill"; // Non-Chromium
+import "construct-style-sheets-polyfill"; // Non-Chromium constructed stylesheets
 import "@ungap/custom-elements"; // Safari
 
 // Hidden variables
@@ -46,11 +46,11 @@ const defaultStyles = `
   :host {
     box-sizing: border-box;
   }
-  :host:before,
-  :host:after,
+  :host::before,
+  :host::after,
   :host *,
-  :host *:before,
-  :host *:after {
+  :host *::before,
+  :host *::after {
     box-sizing: inherit;
   }
   :host([disabled]) {
@@ -98,28 +98,52 @@ const lifecycleMethods = [
   "componentDidLoad",
 ];
 
-// const globalContext = new Set();
-// window.globalContext = globalContext;
+window.mixins = {};
 
-function define(tagName, componentObj, options = {}) {
-  const { mixins = [], base = HTMLElement, extend = undefined } = options;
+function mixin(name, logic) {
+  return {
+    symbol: Symbol(name),
+    mixin: Object.assign(Object.create(null), logic),
+  };
+}
+
+// == mixin ==
+// {symbol, logic, lifecycleMethods }
+// When building prototypeChain
+// { [symbol]: logic }
+
+function define(tagName, mixins = [], options = {}) {
+  const { baseClass = HTMLElement, extend = undefined } = options;
+
+  const mixinSymbols = new Set();
 
   // Add a default mixin that creates observable attributes for `hidden` and `disabled`.
-  let prototypeChain = [
+  let prototypeChain = new Set([
     {
       props: {
         hidden: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
       },
     },
-    mixins,
-  ];
+    ...mixins.map((mixin) => {
+      if (Array.isArray(mixin)) {
+        const [sym, mix] = mixin;
+        mixinSymbols.add(sym);
+        // TODO remove windows.mixins
+        window.mixins[sym] = sym;
+        return mix;
+      } else {
+        return mixin;
+      }
+    }),
+  ]);
 
   // Add the specified web component to the prototype chain.
-  prototypeChain.push(componentObj);
-  prototypeChain = prototypeChain.flat(Infinity);
+  // prototypeChain.push(componentObj);
+  prototypeChain = Array.from(prototypeChain);
   const flattenedPrototype = deepmerge.all(prototypeChain);
 
+  // TODO: Need to handle mixin pre-bound events
   const preBoundEvents = Object.keys(flattenedPrototype).reduce((acc, key) => {
     if (isAnEvent(key) && !lifecycleMethods.includes(key)) {
       acc.push(key.replace(eventRegex, "$1"));
@@ -127,23 +151,29 @@ function define(tagName, componentObj, options = {}) {
     return acc;
   }, []);
 
-  const observedAttrs = [];
-  const attributePropMap = {};
+  const observedAttrs = new Set();
+  const attributePropMap = new Map();
 
+  // Covert props names to snake case attribute names (unless otherwise specified by an `attribute` in the props hash).
   Object.entries(flattenedPrototype.props).forEach((item) => {
     const [propName, { attribute }] = item;
     const attributeName = attribute || pascalCaseToSnakeCase(propName);
-    observedAttrs.push(attributeName);
-    attributePropMap[attributeName] = propName;
+    observedAttrs.add(attributeName);
+    attributePropMap.set(attributeName, propName);
   });
 
   const componentStylesheets = constructStylesheets(prototypeChain);
-  class BlissElement extends base {
-    $ = observable({});
+
+  // const createConstellationSym = Symbol("createConstellation");
+  const supernovaSym = Symbol("supernova");
+  class BlissElement extends baseClass {
+    // Create element's external observable state.
+    $ = observable(Object.create(null));
+
     [isBlissElement] = true;
 
     static get observedAttributes() {
-      return observedAttrs;
+      return Array.from(observedAttrs);
     }
 
     handleEvent(e) {
@@ -152,6 +182,11 @@ function define(tagName, componentObj, options = {}) {
 
     constructor() {
       super();
+
+      // Create each mixins' private internal state.
+      mixinSymbols.forEach((sym) => {
+        this[sym] = { $: observable(Object.create(null)) };
+      });
 
       // // Convert attr prop values to correct typecast values.
       // Object.values(attributePropMap).forEach((propName) => {
@@ -205,6 +240,8 @@ function define(tagName, componentObj, options = {}) {
     disconnectedCallback() {
       if (super.disconnectedCallback) super.disconnectedCallback();
       this.fireEvent("disconnectedCallback");
+
+      this[supernovaSym]();
     }
 
     adoptedCallback() {
@@ -227,16 +264,6 @@ function define(tagName, componentObj, options = {}) {
           val = String(value);
         }
         return val;
-        // if (value && stringIsObject.test(value)) {
-        //   try {
-        //     return JSON.parse(value);
-        //   } catch (e) {
-        //     console.error(e);
-        //     return {};
-        //   }
-        // } else {
-        //   return String(value);
-        // }
       }
     }
 
@@ -244,7 +271,7 @@ function define(tagName, componentObj, options = {}) {
     attributeChangedCallback(name, oldValue, newValue) {
       if (super.attributeChangedCallback) super.attributeChangedCallback();
 
-      const propName = attributePropMap[name];
+      const propName = attributePropMap.get(name);
       this.setStateValue(propName, newValue);
       const { type = String } = flattenedPrototype.props[propName];
       let convertedValue = this.typecastValue(type, newValue);
@@ -254,19 +281,20 @@ function define(tagName, componentObj, options = {}) {
     // Any event (essentially any property or attribute that starts with "on...")
     // is pre-bound so that its "this" is the custom element's host node.
     bindEvents() {
+      // TODO: i'm sure there was a reason, but why???
       preBoundEvents.forEach((event) => {
         this.addEventListener(event, this);
       });
     }
 
-    // Convert properties to strings and set on attributes.
+    // Convert properties to strings and set as attributes.
     // Based on `$` (state) so values are reactive.
     convertPropsToAttributes() {
       Object.entries(flattenedPrototype.props).forEach(([prop, value]) => {
         const converter = value.type || String;
         if (converter === Function) return;
 
-        // Set initial prop values base on default value of attr.
+        // Set initial prop values based on default value of prop.
         if (typeof this[prop] === "undefined") {
           this[prop] = this.typecastValue(converter, value.default);
         }
@@ -295,14 +323,19 @@ function define(tagName, componentObj, options = {}) {
         });
 
         // Set inintial default values.
-        this.$[prop] = flattenedPrototype.props[prop].default;
+        this.$[prop] =
+          typeof this[prop] === "undefined"
+            ? flattenedPrototype.props[prop].default
+            : this[prop];
       });
     }
 
     renderToRoot() {
       if (this.shadow === false || !this.render) return;
 
-      let rootNode = this.shadowRoot || this.attachShadow({ mode: "open" });
+      let rootNode =
+        this.shadowRoot ||
+        this.attachShadow({ mode: this.shadowClosed ? "closed" : "open" });
       rootNode.adoptedStyleSheets = componentStylesheets;
 
       observe(async () => {
@@ -343,55 +376,76 @@ function define(tagName, componentObj, options = {}) {
       });
     }
 
-    // Bliss elements are just "bags of state" that happen to render something on the screen.
-    // Any bliss element can access any parent bliss element's publicly available methods, properties, etc.
-    // by calling `elem.getContext(matcher)` where `matcher` is a valid CSS selector (tag name, id, class, etc.).
-    // An element can have access to more than one parent node's contexts at any time.
-    getContext(matcher) {
-      if (typeof matcher === "string") {
-        let node = this;
-        let ctx;
-        while (!ctx && node.parentElement) {
-          node = node.parentElement;
-          if (node[isBlissElement] && node.matches(matcher)) ctx = node;
-        }
-        if (node && document.documentElement !== node) return node;
-        throw new Error(
-          `A context that matches "${matcher}" could not be found for <${this.tagName.toLowerCase()}>.`
-        );
-      } else if (matcher.nodeType) {
-        return matcher;
-      }
-    }
+    // // Bliss elements are just "bags of state" that happen to render something on the screen.
+    // // Any bliss element can access any parent bliss element's publicly available methods, properties, etc.
+    // // by calling `elem.getContext(matcher)` where `matcher` is a valid CSS selector (tag name, id, class, etc.).
+    // // An element can have access to more than one parent node's contexts at any time.
+    // getContext(matcher) {
+    //   if (typeof matcher === "string") {
+    //     let node = this;
+    //     let ctx;
+    //     while (!ctx && node.parentElement) {
+    //       node = node.parentElement;
+    //       if (node[isBlissElement] && node.matches(matcher)) ctx = node;
+    //     }
+    //     if (node && document.documentElement !== node) return node;
+    //     throw new Error(
+    //       `A context that matches "${matcher}" could not be found for <${this.tagName.toLowerCase()}>.`
+    //     );
+    //   } else if (matcher.nodeType) {
+    //     return matcher;
+    //   }
+    // }
   }
 
   // Build up our web component's prototype.
-  prototypeChain.forEach((proto) => {
-    Object.entries(proto).forEach(([key, value]) => {
-      if (typeof value === typeof Function) {
-        if (lifecycleMethods.includes(key)) {
-          // if (!BlissElement.prototype[key]) BlissElement.prototype[key] = [];
-          // BlissElement.prototype[key].push(value);
-          const originalFn = BlissElement.prototype[key];
-          BlissElement.prototype[key] = function (args) {
-            if (originalFn) originalFn.call(this, args);
-            value.call(this, args);
-          };
-        } else if (isAnEvent(key)) {
-          // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
-          Object.defineProperty(BlissElement.prototype, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-          });
-        } else {
-          BlissElement.prototype[key] = value;
+  Reflect.ownKeys(flattenedPrototype).forEach((key) => {
+    const value = flattenedPrototype[key];
+    if (typeof key === "symbol") {
+      const mixinProto = value;
+      Reflect.ownKeys(mixinProto).forEach((mixinKey) => {
+        const value = mixinProto[mixinKey];
+        buildProperty({ key: mixinKey, value, symbol: key });
+      });
+    } else {
+      buildProperty({ key, value });
+    }
+  });
+
+  function buildProperty({ key, value, symbol }) {
+    console.log({ key, value, symbol });
+    if (typeof value === typeof Function) {
+      if (lifecycleMethods.includes(key)) {
+        const originalFn = BlissElement.prototype[key];
+        BlissElement.prototype[key] = function (args) {
+          if (originalFn) originalFn.call(this, args);
+          value.call(this, args);
+        };
+      } else if (isAnEvent(key)) {
+        // If a mixin has an event defined on it, simply ignore it. The event will need to be moved
+        // outside of the symbol namespaced area, or, alternately, simply named something else and then
+        // called within the `on[event]` method outside the symbol namespaced area.
+        if (symbol) {
+          console.warn(
+            `Mixin ${symbol.toString()} has event "${key}" defined within its namespace. Events can only be defined outside of namespaced sections. Please move the event to the non-namespaced section of the mixin.`
+          );
+          return;
         }
+
+        // Events are handled in a special way on HTMLElement. This is because HTMLElement is a function, not an object.
+
+        Object.defineProperty(BlissElement.prototype, key, {
+          value: value,
+          enumerable: true,
+          configurable: true,
+        });
       } else {
         BlissElement.prototype[key] = value;
       }
-    });
-  });
+    } else {
+      BlissElement.prototype[key] = value;
+    }
+  }
 
   // Create getter/setter for any observed attribute, and make `$[prop] === this[prop]`.
   Object.keys(flattenedPrototype.props).forEach((key) => {
@@ -413,7 +467,11 @@ function define(tagName, componentObj, options = {}) {
   customElements.define(tagName, BlissElement, { extends: extend });
 }
 
-export { define, html, svg, observable, observe, raw };
+// const ref = foreign(() => {
+//   debugger;
+// });
+
+export { define, html, svg, observable, observe, unobserve, raw, render };
 
 // TODO: Need to ensure that:
 // 1) Mixin methods can be overriden

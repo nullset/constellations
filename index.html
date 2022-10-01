@@ -7,12 +7,55 @@
     <title>Vite App</title>
     <script type="module" src="/main.js"></script>
     <style>
+      html {
+        background: lightslategray;
+      }
       *:not(:defined) {
         display: none;
       }
     </style>
   </head>
   <body>
+    <r-1></r-1>
+    <r-1>
+      <template slot="template">
+        () => ({ styles: ` li {border: 1px solid blue} `, connectedCallback() {
+        this.$.messages = []; }, generateMessage() { const time =
+        performance.now(); this.$.messages.push({ time, text: `A message at
+        ${time}`, }); }, render(html) { console.log({ html, this: this });
+        return html`
+        <div style="display: flex; gap: 1em">
+          <aside style="flex: 1 1">
+            <button @click="${this.generateMessage}">Create message</button>
+          </aside>
+          <main style="flex: 2 1">
+            <i>${this.$.monkey}</i>
+            <b>Messages length: ${this.$.messages.length}</b>
+
+            <ol>
+              ${this.$.messages.map((m) => { return html`
+              <li>${m.time} : ${m.text}</li>
+              `; })}
+            </ol>
+          </main>
+        </div>
+        `; }, });
+      </template>
+    </r-1>
+
+    <!-- <r-1 isolate>
+      <script slot="script">
+        () => {
+          console.log("run each time");
+
+          return html`<p>
+            ${this.$.monkey} <b>${this.$.foo}</b> : ${this.$.bar}
+          </p>`;
+        };
+        // alert(1);
+      </script>
+    </r-1> -->
+
     <bliss-tabs>
       <bliss-tab>One</bliss-tab>
       <bliss-tab-content>

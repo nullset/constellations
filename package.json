@@ -15,7 +15,7 @@
     "construct-style-sheets-polyfill": "^3.0.5",
     "deepmerge": "^4.2.2",
     "proxy-pants": "^0.4.3",
-    "uhtml": "^2.8.0",
+    "uhtml": "^3.0.0",
     "weak-value": "^0.2.3"
   }
 }
