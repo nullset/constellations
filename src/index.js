@@ -35,7 +35,7 @@ const nativeShadowDOMable = [
   return acc;
 }, {});
 
-function pascalCaseToSnakeCase(str) {
+function kebabCaseToSnakeCase(str) {
   if (str === "tabIndex") return "tabindex";
   return str
     .replace(/([A-Z])/g, (m) => `-${m.toLocaleLowerCase()}`)
@@ -157,7 +157,7 @@ function define(tagName, mixins = [], options = {}) {
   // Covert props names to snake case attribute names (unless otherwise specified by an `attribute` in the props hash).
   Object.entries(flattenedPrototype.props).forEach((item) => {
     const [propName, { attribute }] = item;
-    const attributeName = attribute || pascalCaseToSnakeCase(propName);
+    const attributeName = attribute || kebabCaseToSnakeCase(propName);
     observedAttrs.add(attributeName);
     attributePropMap.set(attributeName, propName);
   });
@@ -293,7 +293,7 @@ function define(tagName, mixins = [], options = {}) {
 
         if (value.reflect === false) return;
 
-        const attributeName = value.attribute || pascalCaseToSnakeCase(prop);
+        const attributeName = value.attribute || kebabCaseToSnakeCase(prop);
 
         // Observe update state keys, and set attributes appropriately.
         observe(() => {
