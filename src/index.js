@@ -46,11 +46,11 @@ const defaultStyles = `
   :host {
     box-sizing: border-box;
   }
-  :host:before,
-  :host:after,
+  :host::before,
+  :host::after,
   :host *,
-  :host *:before,
-  :host *:after {
+  :host *::before,
+  :host *::after {
     box-sizing: inherit;
   }
   :host([disabled]) {
