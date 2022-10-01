@@ -59,6 +59,19 @@ import { tabbable, symbol as tabbableSym } from "./src/mixins/tabbable";
 // };
 // define("bliss-tabs", [Tabs]);
 
+const TabNumber = {
+  props: {
+    foo: { type: Number },
+  },
+  render() {
+    return html`<b style="font-size: 4em">${this.$.foo}</b>`;
+  },
+  connectedCallback() {
+    console.log(this.previousElementSibling);
+  },
+};
+define("bliss-tab-number", [TabNumber]);
+
 const Tabs = {
   styles: `
     :host nav {

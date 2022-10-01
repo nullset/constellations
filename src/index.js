@@ -4,7 +4,7 @@ import deepmerge from "deepmerge";
 
 // Polyfills
 import "construct-style-sheets-polyfill"; // Non-Chromium constructed stylesheets
-import "@ungap/custom-elements"; // Safari
+import "@ungap/custom-elements"; // Make Safari able to extend in-built elements.
 
 // Hidden variables
 const isBlissElement = Symbol("isBlissElement");
@@ -164,8 +164,6 @@ function define(tagName, mixins = [], options = {}) {
 
   const componentStylesheets = constructStylesheets(prototypeChain);
 
-  // const createConstellationSym = Symbol("createConstellation");
-  const supernovaSym = Symbol("supernova");
   class BlissElement extends baseClass {
     // Create element's external observable state.
     $ = observable(Object.create(null));
@@ -232,8 +230,6 @@ function define(tagName, mixins = [], options = {}) {
     disconnectedCallback() {
       if (super.disconnectedCallback) super.disconnectedCallback();
       this.fireEvent("disconnectedCallback");
-
-      this[supernovaSym]();
     }
 
     adoptedCallback() {
@@ -372,22 +368,6 @@ function define(tagName, mixins = [], options = {}) {
     // // Any bliss element can access any parent bliss element's publicly available methods, properties, etc.
     // // by calling `elem.getContext(matcher)` where `matcher` is a valid CSS selector (tag name, id, class, etc.).
     // // An element can have access to more than one parent node's contexts at any time.
-    // getContext(matcher) {
-    //   if (typeof matcher === "string") {
-    //     let node = this;
-    //     let ctx;
-    //     while (!ctx && node.parentElement) {
-    //       node = node.parentElement;
-    //       if (node[isBlissElement] && node.matches(matcher)) ctx = node;
-    //     }
-    //     if (node && document.documentElement !== node) return node;
-    //     throw new Error(
-    //       `A context that matches "${matcher}" could not be found for <${this.tagName.toLowerCase()}>.`
-    //     );
-    //   } else if (matcher.nodeType) {
-    //     return matcher;
-    //   }
-    // }
   }
 
   // Build up our web component's prototype.
@@ -458,10 +438,6 @@ function define(tagName, mixins = [], options = {}) {
 
   customElements.define(tagName, BlissElement, { extends: extend });
 }
-
-// const ref = foreign(() => {
-//   debugger;
-// });
 
 export { define, html, svg, observable, observe, unobserve, raw, render };
 
