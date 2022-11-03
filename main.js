@@ -11,6 +11,7 @@ import {
 } from "./src/index";
 import { keyboardNavigable } from "./src/mixins/keyboardNavigable";
 import { tabbable, symbol as tabbableSym } from "./src/mixins/tabbable";
+import DOMPurify from "dompurify";
 
 // const Tabs = {
 //   styles: `
@@ -63,11 +64,54 @@ const TabNumber = {
   props: {
     foo: { type: Number },
   },
-  render() {
-    return html`<b style="font-size: 4em">${this.$.foo}</b>`;
+  componentDidLoad() {
+    const prevElem = this.previousElementSibling;
+    // -- DOES NOT WORK
+    // this.$.foo = prevElem.$.activeTab;
+
+    // this.$.foo = observable(prevElem.$.activeTab);
+    // debugger;
+
+    observe(() => {
+      // WORKS -- Make it a computed
+      this.$.foo = prevElem.$.activeTab;
+    });
+
+    // this.$listen = function (savesTo, listenTo, path) {
+    //   const paths = path.split(".");
+    //   observe(() => {
+    //     debugger;
+    //     this.$[savesTo] = listenTo;
+    //   });
+    // };
+    //
+    // this.$listen("bar", prevElem, "$.activeTab");
+
+    // debugger;
+    Object.defineProperty(this.$, "baz", {
+      get() {
+        return prevElem.$.activeTab;
+      },
+    });
+
+    this.$listen = (prop, state, origProp) => {
+      Object.defineProperty(this.$, prop, {
+        get() {
+          return state[origProp];
+        },
+      });
+    };
+
+    this.$listen("moo", prevElem.$, "activeTab");
+
+    // this.$.blah = observe(() => {
+    //   return 44;
+    // });
   },
-  connectedCallback() {
-    console.log(this.previousElementSibling);
+  render() {
+    return html`<b style="font-size: 4em">
+      ${this.$.foo} <span style="color: red">${this.$.bar}</span>
+    </b>`;
   },
 };
 define("bliss-tab-number", [TabNumber]);
@@ -305,3 +349,26 @@ const RenderElem = {
   },
 };
 define("r-1", [RenderElem]);
+
+const Sanitize = {
+  connectedCallback() {
+    const clone = this.content.cloneNode(true);
+    const sanitized = DOMPurify.sanitize(clone, {
+      CUSTOM_ELEMENT_HANDLING: {
+        tagNameCheck: /^aha-/,
+        allowCustomizedBuiltInElements: true,
+      },
+    });
+    this.replaceWith(
+      document.createRange().createContextualFragment(sanitized)
+    );
+  },
+  render() {
+    debugger;
+    return html`<slot></slot>`;
+  },
+};
+define("bliss-sanitize", [Sanitize], {
+  extend: "template",
+  baseClass: HTMLTemplateElement,
+});

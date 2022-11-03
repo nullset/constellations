@@ -206,13 +206,14 @@ function define(tagName, mixins = [], options = {}) {
       this.$[name] = convertedValue;
     }
 
-    fireEvent(eventName, detail = {}) {
-      const event = new CustomEvent(
-        `${this.tagName.toLowerCase()}:${eventName}`,
-        {
-          detail: Object.assign(detail, { element: this }),
-        }
-      );
+    fireEvent(eventName, detail = {}, unscoped = false) {
+      eventName =
+        lifecycleMethods.includes(eventName) || unscoped
+          ? eventName
+          : `${this.tagName.toLowerCase()}:${eventName}`;
+      const event = new CustomEvent(eventName, {
+        detail: Object.assign(detail, { element: this }),
+      });
       this.dispatchEvent(event);
       document.dispatchEvent(event);
     }
@@ -435,7 +436,6 @@ function define(tagName, mixins = [], options = {}) {
       });
     }
   });
-
   customElements.define(tagName, BlissElement, { extends: extend });
 }
 

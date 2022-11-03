@@ -14,6 +14,7 @@
     "@ungap/custom-elements": "^1.0.0",
     "construct-style-sheets-polyfill": "^3.0.5",
     "deepmerge": "^4.2.2",
+    "dompurify": "^2.4.0",
     "proxy-pants": "^0.4.3",
     "uhtml": "^3.0.0",
     "weak-value": "^0.2.3"
