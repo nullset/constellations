@@ -6,6 +6,9 @@ import deepmerge from "deepmerge";
 import "construct-style-sheets-polyfill"; // Non-Chromium constructed stylesheets
 import "@ungap/custom-elements"; // Make Safari able to extend in-built elements.
 
+const globalStore = new WeakMap();
+window.globalStore = globalStore;
+
 // Hidden variables
 const isBlissElement = Symbol("isBlissElement");
 const componentHasLoaded = Symbol("componentHasLoaded");
@@ -165,9 +168,6 @@ function define(tagName, mixins = [], options = {}) {
   const componentStylesheets = constructStylesheets(prototypeChain);
 
   class BlissElement extends baseClass {
-    // Create element's external observable state.
-    $ = observable(Object.create(null));
-
     [isBlissElement] = true;
 
     static get observedAttributes() {
@@ -178,8 +178,16 @@ function define(tagName, mixins = [], options = {}) {
       this["on" + e.type](e);
     }
 
+    get $() {
+      return globalStore.get(this);
+    }
+
     constructor() {
       super();
+
+      // Create element's external observable state.
+      const $ = observable(Object.create(null));
+      globalStore.set(this, $);
 
       // Create each mixins' private internal state.
       mixinSymbols.forEach((sym) => {
