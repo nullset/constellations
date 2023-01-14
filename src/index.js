@@ -1,3 +1,5 @@
+// TODO: Name it "nebulous"
+
 import { observable, observe, unobserve, raw } from "@nx-js/observer-util";
 import { render, html, svg } from "uhtml";
 import deepmerge from "deepmerge";
@@ -8,6 +10,21 @@ import "@ungap/custom-elements"; // Make Safari able to extend in-built elements
 
 const globalStore = new WeakMap();
 window.globalStore = globalStore;
+
+const watchForElements = new Set();
+window.watchForElements = watchForElements;
+
+window.addEventListener("connectedCallback", (e) => {
+  if (watchForElements.size) {
+    watchForElements.forEach((watchFn) => {
+      const result = watchFn();
+      if (result) {
+        console.log("deleting");
+        watchForElements.delete(watchFn);
+      }
+    });
+  }
+});
 
 // Hidden variables
 const isBlissElement = Symbol("isBlissElement");
@@ -221,9 +238,23 @@ function define(tagName, mixins = [], options = {}) {
           : `${this.tagName.toLowerCase()}:${eventName}`;
       const event = new CustomEvent(eventName, {
         detail: Object.assign(detail, { element: this }),
+        bubbles: true,
+        cancelable: false,
+        composed: true,
       });
       this.dispatchEvent(event);
-      document.dispatchEvent(event);
+      // window.dispatchEvent(event);
+    }
+
+    $watch(watchFn, callbackFn) {
+      let matchingElem = watchFn();
+      if (matchingElem) {
+        observe(() => callbackFn(matchingElem));
+        return true;
+      } else {
+        // Add to the queue of elements to watch for.
+        watchForElements.add(() => this.$watch(watchFn, callbackFn));
+      }
     }
 
     connectedCallback() {
