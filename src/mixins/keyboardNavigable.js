@@ -1,4 +1,4 @@
-import { observe } from "../index";
+import { observe } from "../old/index";
 
 export const symbol = Symbol("keyboardNavigable");
 

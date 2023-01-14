@@ -22,6 +22,10 @@ const Tabs = {
   props: {
     active: { type: Number, default: 0 },
     fooBar: { type: Boolean, default: true },
+    emoji: { type: String },
+  },
+  connectedCallback() {
+    this.emoji = `❤️`;
   },
   render() {
     return html`

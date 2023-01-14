@@ -2,7 +2,7 @@
 // First item in the array is the symbol of the mixin. This allows for private methods/variables not just within components but within _mixins_.
 // Second item in the array is the mixin object. It follows the same conventions as building a regular bliss element (connectedCallback, etc.).
 
-import { observe, observable, raw } from "../index";
+import { observe, observable, raw } from "../old/index";
 
 export const symbol = Symbol("tabbable");
 
