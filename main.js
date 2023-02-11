@@ -111,6 +111,9 @@ const TabNextNumber = {
       (watched) => {
         console.log("---", watched.$.activeTab);
         this.$.number = watched.$.activeTab;
+      },
+      () => {
+        this.$.number = "aaa";
       }
     );
   },

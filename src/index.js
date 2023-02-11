@@ -246,14 +246,15 @@ function define(tagName, mixins = [], options = {}) {
       // window.dispatchEvent(event);
     }
 
-    $watch(watchFn, callbackFn) {
-      let matchingElem = watchFn();
-      if (matchingElem) {
-        observe(() => callbackFn(matchingElem));
+    $watch(watchFn, callbackFn, placeholderFn) {
+      let matchingCondition = watchFn();
+      if (matchingCondition) {
+        observe(() => callbackFn(matchingCondition));
         return true;
       } else {
         // Add to the queue of elements to watch for.
         watchForElements.add(() => this.$watch(watchFn, callbackFn));
+        if (placeholderFn) placeholderFn();
       }
     }
 
